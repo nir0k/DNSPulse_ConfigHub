@@ -19,3 +19,23 @@
 
 # Go workspace file
 go.work
+
+# Custom
+.env
+.vscode
+.vscode/
+*.bak
+*.log
+test/
+test/*
+.DS_store
+*.log.gz
+*.json.gz
+log.json
+audit.json
+config.yaml
+*.db
+*.pem
+/bin/*
+*.pem
+/log

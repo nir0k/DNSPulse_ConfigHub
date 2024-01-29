@@ -1,0 +1,650 @@
+<!-- templates/config-general.html -->
+{{ template "base.html" . }}
+
+{{ define "content" }}
+<div class="container mt-4">
+    <h1>General Configuration</h1>
+    <p>This page displays the main DataHub configuration</p>
+
+    <!-- General Config -->
+    <div class="accordion" id="configAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingGeneral">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGeneral" aria-expanded="true" aria-controls="collapseGeneral">
+                    General Configuration
+                </button>
+            </h2>
+            <div id="collapseGeneral" class="accordion-collapse collapse" aria-labelledby="headingGeneral" data-bs-parent="#configAccordion">
+                <div class="accordion-body">
+                    <!-- Read-only mode -->
+                    <div id="generalConfigReadOnly">
+                        <div class="row mb-2">
+                            <div class="col-4">Configuration file path:</div>
+                            <div class="col-8">
+                                <span id="generalConfigPath">{{ .Config.General.Path }}</span>
+                            </div>
+                        </div>
+                        <!-- Add more read-only parameters here if needed -->
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-primary" onclick="toggleEditMode('generalConfig')">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit mode (hidden by default) -->
+                    <div id="generalConfigEditMode" style="display: none;">
+                        <div class="row mb-2">
+                            <div class="col-4">Configuration file path:</div>
+                            <div class="col-8">
+                                <input type="text" class="form-control" id="generalConfigPathEdit" value="{{ .Config.General.Path }}">
+                            </div>
+                        </div>
+                        <!-- Add more editable parameters here if needed -->
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-success" onclick="saveGeneralConfig()">Save</button>
+                                <button type="button" class="btn btn-secondary" onclick="cancelEditMode('generalConfig')">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log Config -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingLog">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLog" aria-expanded="false" aria-controls="collapseLog">
+                    Log Configuration
+                </button>
+            </h2>
+            <div id="collapseLog" class="accordion-collapse collapse" aria-labelledby="headingLog" data-bs-parent="#configAccordion">
+                <div class="accordion-body">
+                    <!-- Read-only mode -->
+                    <div id="logConfigReadOnly">
+                        <div class="row mb-2">
+                            <div class="col-4">Path:</div>
+                            <div class="col-8">
+                                <span id="logConfigPath">{{ .Config.Log.Path }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Min Severity:</div>
+                            <div class="col-8">
+                                <span id="logConfigMinSeverity">{{ .Config.Log.MinSeverity }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Age:</div>
+                            <div class="col-8">
+                                <span id="logConfigMaxAge">{{ .Config.Log.MaxAge }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Size:</div>
+                            <div class="col-8">
+                                <span id="logConfigMaxSize">{{ .Config.Log.MaxSize }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Files:</div>
+                            <div class="col-8">
+                                <span id="logConfigMaxFiles">{{ .Config.Log.MaxFiles }}</span>
+                            </div>
+                        </div>
+                        <!-- Add more read-only parameters here if needed -->
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-primary" onclick="toggleEditMode('logConfig')">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit mode (hidden by default) -->
+                    <div id="logConfigEditMode" style="display: none;">
+                        <div class="row mb-2">
+                            <div class="col-4">Path:</div>
+                            <div class="col-8">
+                                <input type="text" class="form-control" id="logConfigPathEdit" value="{{ .Config.Log.Path }}">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Min Severity:</div>
+                            <div class="col-8">
+                                <select class="form-select" id="logConfigMinSeverityEdit">
+                                    <option value="debug" {{ if eq .Config.Log.MinSeverity "debug" }}selected{{ end }}>debug</option>
+                                    <option value="info" {{ if eq .Config.Log.MinSeverity "info" }}selected{{ end }}>info</option>
+                                    <option value="warning" {{ if eq .Config.Log.MinSeverity "warning" }}selected{{ end }}>warning</option>
+                                    <option value="error" {{ if eq .Config.Log.MinSeverity "error" }}selected{{ end }}>error</option>
+                                </select>    
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Age:</div>
+                            <div class="col-8">
+                                <input type="number" class="form-control" id="logConfigMaxAgeEdit" value="{{ .Config.Log.MaxAge }}">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Size:</div>
+                            <div class="col-8">
+                                <input type="number" class="form-control" id="logConfigMaxSizeEdit" value="{{ .Config.Log.MaxSize }}">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Files:</div>
+                            <div class="col-8">
+                                <input type="number" class="form-control" id="logConfigMaxFilesEdit" value="{{ .Config.Log.MaxFiles }}">
+                            </div>
+                        </div>
+                        <!-- Add more editable parameters here if needed -->
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-success" onclick="saveLogConfig()">Save</button>
+                                <button type="button" class="btn btn-secondary" onclick="cancelEditMode('logConfig')">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Audit Config -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingAudit">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAudit" aria-expanded="false" aria-controls="collapseAudit">
+                    Audit Configuration
+                </button>
+            </h2>
+            <div id="collapseAudit" class="accordion-collapse collapse" aria-labelledby="headingAudit" data-bs-parent="#configAccordion">
+                <div class="accordion-body">
+                    <!-- Read-only mode -->
+                    <div id="auditConfigReadOnly">
+                        <div class="row mb-2">
+                            <div class="col-4">Path:</div>
+                            <div class="col-8">
+                                <span id="auditConfigPath">{{ .Config.Audit.Path }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Min Severity:</div>
+                            <div class="col-8">
+                                <span id="auditConfigMinSeverity">{{ .Config.Audit.MinSeverity }}</span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-4">Max Age:</div>
+                            <div class="col-8">
+                                <span id="auditConfigMaxAge">{{ .Config.Audit.MaxAge }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Size:</div>
+                            <div class="col-8">
+                                <span id="auditConfigMaxSize">{{ .Config.Audit.MaxSize }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Files:</div>
+                            <div class="col-8">
+                                <span id="auditConfigMaxFiles">{{ .Config.Audit.MaxFiles }}</span>
+                            </div>
+                        </div>
+                        <!-- Add more read-only parameters here if needed -->
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-primary" onclick="toggleEditMode('auditConfig')">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit mode (hidden by default) -->
+                    <div id="auditConfigEditMode" style="display: none;">
+                        <div class="row mb-2">
+                            <div class="col-4">Path:</div>
+                            <div class="col-8">
+                                <input type="text" class="form-control" id="auditConfigPathEdit" value="{{ .Config.Audit.Path }}">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Min Severity:</div>
+                            <div class="col-8">
+                                <select class="form-select" id="auditConfigMinSeverityEdit">
+                                    <option value="debug" {{ if eq .Config.Audit.MinSeverity "debug" }}selected{{ end }}>debug</option>
+                                    <option value="info" {{ if eq .Config.Audit.MinSeverity "info" }}selected{{ end }}>info</option>
+                                    <option value="warning" {{ if eq .Config.Audit.MinSeverity "warning" }}selected{{ end }}>warning</option>
+                                    <option value="error" {{ if eq .Config.Audit.MinSeverity "error" }}selected{{ end }}>error</option>
+                                </select>                                
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Age:</div>
+                            <div class="col-8">
+                                <input type="number" class="form-control" id="auditConfigMaxAgeEdit" value="{{ .Config.Audit.MaxAge }}">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Size:</div>
+                            <div class="col-8">
+                                <input type="number" class="form-control" id="auditConfigMaxSizeEdit" value="{{ .Config.Audit.MaxSize }}">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Files:</div>
+                            <div class="col-8">
+                                <input type="number" class="form-control" id="auditConfigMaxFilesEdit" value="{{ .Config.Audit.MaxFiles }}">
+                            </div>
+                        </div>
+                        <!-- Add more editable parameters here if needed -->
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-success" onclick="saveAuditConfig()">Save</button>
+                                <button type="button" class="btn btn-secondary" onclick="cancelEditMode('auditConfig')">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- WebServer Config -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingWebServer">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWebServer" aria-expanded="false" aria-controls="collapseWebServer">
+                    Web-Server Configuration
+                </button>
+            </h2>
+            <div id="collapseWebServer" class="accordion-collapse collapse" aria-labelledby="headingWebServer" data-bs-parent="#configAccordion">
+                <div class="accordion-body">
+                    <!-- Read-only mode -->
+                    <div id="webServerConfigReadOnly">
+                        <div class="row mb-2">
+                            <div class="col-4">Port:</div>
+                            <div class="col-8">
+                                <span id="webServerConfigPort">{{ .Config.WebServer.Port }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Listen Address:</div>
+                            <div class="col-8">
+                                <span id="webServerConfigListenAddress">{{ .Config.WebServer.ListenAddress }}</span>
+                            </div>
+                        </div>
+                        <!-- SSL Enabled Checkbox -->
+                        <div class="row mb-2">
+                            <div class="col-4">SSL:</div>
+                            <div class="col-8">
+                                <input type="checkbox" id="webServerConfigSSLEnabled" {{ if .Config.WebServer.SSLEnabled }}checked{{ end }} disabled>
+                            </div>
+                        </div>
+                        <!-- SSL-dependent fields, initially hidden if SSL is disabled -->
+                        <div id="sslDependentFields" style="{{ if not .Config.WebServer.SSLEnabled }}display: none;{{ end }}">
+                            <div class="row mb-2">
+                                <!-- Certificate Path -->
+                                <div class="col-4">Certificate Path:</div>
+                                <div class="col-8">
+                                    <span id="webServerConfigSSLCertPath">{{ .Config.WebServer.SSLCertPath }}</span>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <!-- Certificate Key Path -->
+                                <div class="col-4">Certificate Key Path:</div>
+                                <div class="col-8">
+                                    <span id="webServerConfigSSLKeyPath">{{ .Config.WebServer.SSLKeyPath }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Sesion Timeout:</div>
+                            <div class="col-8">
+                                <span id="webServerConfigSesionTimeout">{{ .Config.WebServer.SesionTimeout }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Username:</div>
+                            <div class="col-8">
+                                <span id="webServerConfigUsername">{{ .Config.WebServer.Username }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Password:</div>
+                            <div class="col-8">
+                                <span id="webServerConfigPassword">{{ .Config.WebServer.Password }}</span>
+                            </div>
+                        </div>
+                        <!-- Add more read-only parameters here if needed -->
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-primary" onclick="toggleEditMode('webServerConfig')">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit mode (hidden by default) -->
+                    <div id="webServerConfigEditMode" style="display: none;">
+                        <div class="row mb-2">
+                            <div class="col-4">Port:</div>
+                            <div class="col-8">
+                                <input type="number" class="form-control" id="webServerConfigPortEdit" value="{{ .Config.WebServer.Port }}">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Listen Address:</div>
+                            <div class="col-8">
+                                <input type="text" class="form-control" id="webServerConfigListenAddressEdit" value="{{ .Config.WebServer.ListenAddress }}">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">SSL:</div>
+                            <div class="col-8">
+                                <input type="checkbox" id="webServerConfigSSLEnabledEdit" {{ if .Config.WebServer.SSLEnabled }}checked{{ end }} onchange="toggleSSLCertificateFields()">
+                            </div>
+                        </div>
+                        <div id="sslCertificateFields" style="{{ if not .Config.WebServer.SSLEnabled }}display: none;{{ end }}">
+                            <div class="row mb-2">
+                                <div class="col-4">Certificate Path:</div>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" id="webServerConfigSSLCertPathEdit" value="{{ .Config.WebServer.SSLCertPath }}">
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4">Certificate Key Path:</div>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" id="webServerConfigSSLKeyPathEdit" value="{{ .Config.WebServer.SSLKeyPath }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-2">
+                            <div class="col-4">Sesion Timeout:</div>
+                            <div class="col-8">
+                                <input type="number" class="form-control" id="webServerConfigSesionTimeoutEdit" value="{{ .Config.WebServer.SesionTimeout }}">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Username:</div>
+                            <div class="col-8">
+                                <input type="text" class="form-control" id="webServerConfigUsernameEdit" value="{{ .Config.WebServer.Username }}">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Password:</div>
+                            <div class="col-8">
+                                <input type="text" class="form-control" id="webServerConfigPasswordEdit" value="{{ .Config.WebServer.Password }}">
+                            </div>
+                        </div>
+                        <!-- Add more editable parameters here if needed -->
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-success" onclick="saveWebServerConfig()">Save</button>
+                                <button type="button" class="btn btn-secondary" onclick="cancelEditMode('webServerConfig')">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Add other configuration sections SegmentConfigs here in a similar way -->
+
+    </div>
+</div>
+<script>
+    function toggleSSLFields() {
+        var sslEnabledCheckbox = document.getElementById('webServerConfigSSLEnabled');
+        if (sslEnabledCheckbox) {
+            var sslEnabled = sslEnabledCheckbox.checked;
+            var sslFields = document.getElementById('sslDependentFields');
+            if (sslFields) {
+                sslFields.style.display = sslEnabled ? 'block' : 'none';
+            }
+        }
+    }    
+    document.addEventListener('DOMContentLoaded', toggleSSLFields);
+    
+
+    function toggleEditMode(section) {
+        var readOnlySection = document.getElementById(section + 'ReadOnly');
+        var editModeSection = document.getElementById(section + 'EditMode');
+    
+        if (readOnlySection && editModeSection) {
+            readOnlySection.style.display = 'none';
+            editModeSection.style.display = 'block';
+    
+            if (section === 'webServerConfig') {
+                var sslEnabledCheckbox = document.getElementById('webServerConfigSSLEnabled');
+                originalSSLValue = sslEnabledCheckbox.checked; // Save the original state
+                var sslEnabledEditCheckbox = document.getElementById('webServerConfigSSLEnabledEdit');
+                sslEnabledEditCheckbox.disabled = false;
+                sslEnabledEditCheckbox.checked = sslEnabledCheckbox.checked;
+            }
+        }
+    }
+    
+
+    function toggleSSLCertificateFields() {
+        var sslEnabled = document.getElementById('webServerConfigSSLEnabledEdit').checked;
+        var sslCertificateFields = document.getElementById('sslCertificateFields'); // Assuming this is the ID of the container div for the certificate fields
+    
+        if (sslEnabled) {
+            sslCertificateFields.style.display = 'block';
+        } else {
+            sslCertificateFields.style.display = 'none';
+        }
+    }
+    
+    function cancelEditMode(section) {
+        var readOnlySection = document.getElementById(section + 'ReadOnly');
+        var editModeSection = document.getElementById(section + 'EditMode');
+    
+        if (readOnlySection && editModeSection) {
+            readOnlySection.style.display = 'block';
+            editModeSection.style.display = 'none';
+    
+            if (section === 'webServerConfig') {
+                var sslEnabledCheckbox = document.getElementById('webServerConfigSSLEnabled');
+                var sslEnabledEditCheckbox = document.getElementById('webServerConfigSSLEnabledEdit');
+                if (sslEnabledCheckbox && sslEnabledEditCheckbox) {
+                    sslEnabledCheckbox.checked = originalSSLValue; // Reset to the original state
+                    sslEnabledCheckbox.disabled = true;
+                }
+            }
+        } else {
+            console.error('Element(s) not found for section:', section);
+        }
+    }
+    
+    
+
+    function saveGeneralConfig() {
+        // Retrieve the modified value from the input field
+        var generalConfigPath = document.getElementById('generalConfigPathEdit').value;
+        var updatedConfig = { general: { path: generalConfigPath } };
+
+        fetch('/update-general-config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedConfig),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Response from server:", data);
+            if (data.success) {
+                document.getElementById('generalConfigPath').textContent = generalConfigPath;
+                cancelEditMode('generalConfig');
+            } else {
+                alert('Failed to update general configuration.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating general configuration.');
+        });
+    }
+
+    function saveLogConfig() {
+        // Retrieve the modified values from the input fields
+        var logConfigPath = document.getElementById('logConfigPathEdit').value;
+        var logConfigMinSeverity = document.getElementById('logConfigMinSeverityEdit').value;
+        var logConfigMaxAge = parseInt(document.getElementById('logConfigMaxAgeEdit').value, 10);
+        var logConfigMaxSize = parseInt(document.getElementById('logConfigMaxSizeEdit').value, 10);
+        var logConfigMaxFiles = parseInt(document.getElementById('logConfigMaxFilesEdit').value, 10);
+
+        // Hide edit mode and show read-only mode
+        cancelEditMode('logConfig');
+
+        // Send the updated configuration to the server (you can use AJAX or any other method)
+        // For simplicity, let's assume a hypothetical updateConfig function
+        // updateConfig(updatedConfig);
+        var updatedConfig = {
+            data: {
+                path: logConfigPath,
+                minSeverity: logConfigMinSeverity,
+                maxAge: logConfigMaxAge,
+                maxSize: logConfigMaxSize,
+                MaxFiles: logConfigMaxFiles
+            }
+        };
+        // Send the updated configuration to the server
+        fetch('/update-log-config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedConfig),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the read-only element with the new value
+                document.getElementById('logConfigPath').textContent = logConfigPath;
+                document.getElementById('logConfigMinSeverity').textContent = logConfigMinSeverity;
+                document.getElementById('logConfigMaxAge').textContent = logConfigMaxAge.toString();
+                document.getElementById('logConfigMaxSize').textContent = logConfigMaxSize.toString();
+                document.getElementById('logConfigMaxFiles').textContent = logConfigMaxFiles.toString();
+
+                // Hide edit mode and show read-only mode
+                cancelEditMode('logConfig');
+            } else {
+                // Handle error case
+                alert('Failed to update log configuration.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating log configuration.');
+        });
+    }
+
+    function saveAuditConfig() {
+        // Retrieve the modified values from the input fields
+        var auditConfigPath = document.getElementById('auditConfigPathEdit').value;
+        var auditConfigMinSeverity = document.getElementById('auditConfigMinSeverityEdit').value;
+        var auditConfigMaxAge = parseInt(document.getElementById('auditConfigMaxAgeEdit').value, 10);
+        var auditConfigMaxSize = parseInt(document.getElementById('auditConfigMaxSizeEdit').value, 10);
+        var auditConfigMaxFiles = parseInt(document.getElementById('auditConfigMaxFilesEdit').value, 10);
+
+        // Hide edit mode and show read-only mode
+        cancelEditMode('auditConfig');
+
+        var updatedConfig = {
+            data: {
+                path: auditConfigPath,
+                minSeverity: auditConfigMinSeverity,
+                maxAge: auditConfigMaxAge,
+                maxSize: auditConfigMaxSize,
+                MaxFiles: auditConfigMaxFiles
+            }
+        };
+        // Send the updated configuration to the server
+        fetch('/update-audit-config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedConfig),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the read-only element with the new value
+                document.getElementById('auditConfigPath').textContent = auditConfigPath;
+                document.getElementById('auditConfigMinSeverity').textContent = auditConfigMinSeverity;
+                document.getElementById('auditConfigMaxAge').textContent = auditConfigMaxAge.toString();
+                document.getElementById('auditConfigMaxSize').textContent = auditConfigMaxSize.toString();
+                document.getElementById('auditConfigMaxFiles').textContent = auditConfigMaxFiles.toString();
+
+                // Hide edit mode and show read-only mode
+                cancelEditMode('auditConfig');
+            } else {
+                // Handle error case
+                alert('Failed to update audit configuration.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating audit configuration.');
+        });
+    }
+
+    function saveWebServerConfig() {
+        // Retrieve the modified values from the input fields
+        var webServerConfigPort = parseInt(document.getElementById('webServerConfigPortEdit').value, 10);
+        var webServerConfigListenAddress = document.getElementById('webServerConfigListenAddressEdit').value;
+        var webServerConfigSSLEnabled = document.getElementById('webServerConfigSSLEnabledEdit').checked;
+        var webServerConfigSSLCertPath = document.getElementById('webServerConfigSSLCertPathEdit').value;
+        var webServerConfigSSLKeyPath = document.getElementById('webServerConfigSSLKeyPathEdit').value;
+        var webServerConfigSesionTimeout = parseInt(document.getElementById('webServerConfigSesionTimeoutEdit').value, 10);
+        var webServerConfigUsername = document.getElementById('webServerConfigUsernameEdit').value;
+        var webServerConfigPassword = document.getElementById('webServerConfigPasswordEdit').value;
+
+        // Hide edit mode and show read-only mode
+        cancelEditMode('webServerConfig');
+
+        var updatedConfig = {
+            data: {
+                port: webServerConfigPort,
+                listenAddress: webServerConfigListenAddress,
+                sslIsEnable: webServerConfigSSLEnabled,
+                sslCertPath: webServerConfigSSLCertPath,
+                sslKeyPath: webServerConfigSSLKeyPath,
+                sesionTimeout: webServerConfigSesionTimeout,
+                username: webServerConfigUsername,
+                password: webServerConfigPassword
+            }
+        };
+        // Send the updated configuration to the server
+        fetch('/update-webserver-config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedConfig),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the read-only element with the new value
+                document.getElementById('webServerConfigPort').textContent = webServerConfigPort.toString();
+                document.getElementById('webServerConfigListenAddress').textContent = webServerConfigListenAddress;
+                var readOnlySSLEnabledCheckbox = document.getElementById('webServerConfigSSLEnabled');
+                readOnlySSLEnabledCheckbox.checked = webServerConfigSSLEnabled;
+                document.getElementById('webServerConfigSSLCertPath').textContent = webServerConfigSSLCertPath;
+                document.getElementById('webServerConfigSSLKeyPath').textContent = webServerConfigSSLKeyPath;
+                document.getElementById('webServerConfigSesionTimeout').textContent = webServerConfigSesionTimeout.toString();
+                document.getElementById('webServerConfigUsername').textContent = webServerConfigUsername;
+                document.getElementById('webServerConfigPassword').textContent = webServerConfigPassword;
+
+                // Hide edit mode and show read-only mode
+                cancelEditMode('webServerConfig');
+            } else {
+                // Handle error case
+                alert('Failed to update web-server configuration.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating web-server configuration.');
+        });
+    }
+</script>
+{{ end }}

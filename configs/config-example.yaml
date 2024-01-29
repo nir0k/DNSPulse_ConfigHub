@@ -1,0 +1,28 @@
+general:
+  path: configs/config.yaml
+log:
+  path: logs/log.json
+  minseverity: debug
+  maxage: 10
+  maxsize: 10
+  maxfiles: 10
+Audit:
+  path: logs/audit.json
+  minSeverity: info
+  maxAge: 30
+  maxSize: 10
+  maxFiles: 11
+WebServer:
+  port: 443
+  listenAddress: 0.0.0.0
+  sslIsEnable: false
+  sslCertPath: configs/ssl/cert.pem
+  sslKeyPath: configs/ssl/key.pem
+  sesionTimeout: 999
+  username: admin
+  password: Password
+Configs:
+- name: PROD-SRV-CS
+  path: configs/prod_srv_cs.yaml
+- name: TEST-SRV-CS
+  path: configs/test_srv_cs.yaml

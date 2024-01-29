@@ -1,0 +1,13 @@
+<!-- templates/index.html -->
+{{ template "base.html" . }}
+
+{{ define "content" }}
+    <div class="container"> <!-- Bootstrap container class -->
+        <div class="row justify-content-center"> <!-- Center the column horizontally -->
+            <div class="col-md-8"> <!-- Adjust the size as per your requirement -->
+                <h1>Welcome to My Website</h1>
+                <p>This is the home page.</p>
+            </div>
+        </div>
+    </div>
+{{ end }}
