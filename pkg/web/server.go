@@ -16,7 +16,7 @@ import (
     "html/template"
 )
 
-//go:embed templates/* static/css/* static/js/* static/images/*
+//go:embed templates/* static/css/* static/js/* static/images/* static/webfonts/*
 var tmplFS embed.FS
 
 var (
@@ -26,30 +26,30 @@ var (
     configSegmentTemplate *template.Template
 )
 
-func init() {
+func setup() error {
     staticFS, err := fs.Sub(tmplFS, "static")
     if err != nil {
-        logger.Logger.Panicf("Error loading static files: %v", err)
+        return fmt.Errorf("failed loading static files: %v", err)
     }
 
     indexTemplate, err = template.ParseFS(tmplFS, "templates/index.html", "templates/base.html")
     if err != nil {
-        logger.Logger.Panicf("Error parsing index template: %v", err)
+        return fmt.Errorf("failed parsing index template: %v", err)
     }
 
     loginTemplate, err = template.ParseFS(tmplFS, "templates/login.html", "templates/base.html")
     if err != nil {
-        logger.Logger.Panicf("Error parsing login template: %v", err)
+        return fmt.Errorf("failed parsing login template: %v", err)
     }
 
     configGeneralTemplate, err = template.ParseFS(tmplFS, "templates/config-general.html", "templates/base.html")
     if err != nil {
-        logger.Logger.Panicf("Error parsing login template: %v", err)
+        return fmt.Errorf("failed parsing config-general template: %v", err)
     }
 
     configSegmentTemplate, err = template.ParseFS(tmplFS, "templates/config-segment.html", "templates/base.html")
     if err != nil {
-        logger.Logger.Panicf("Error parsing login template: %v", err)
+        return fmt.Errorf("failed parsing config-segment template: %v", err)
     }
 
     http.Handle("/", handlers.AuthMiddleware(handlers.HomeHandler(indexTemplate)))
@@ -61,9 +61,15 @@ func init() {
     http.HandleFunc("/update-webserver-config", handlers.AuthMiddleware(handlers.UpdateWebServerConfigHandler))
     http.HandleFunc("/config/segment", handlers.AuthMiddleware(handlers.ConfigSegmentHandler(configSegmentTemplate)))
     http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
+    
+    return nil
 }
 
 func Webserver() {
+    err := setup()
+    if err != nil {
+        logger.Logger.Errorf("Web server setup failed: %v", err)
+    }
 	done := make(chan bool)
     go startServer(done)
 	<-done
@@ -81,11 +87,21 @@ func startServer(done chan bool) {
 		logger.Logger.Errorf("Port is already in use. Cannot start the web server. Port: %d\n", conf.Port)
         return
     }
-
-    server = &http.Server{
-        Addr: ":" + strconv.Itoa(conf.Port),
-        Handler: nil,
-        TLSConfig: &tls.Config{},
+    serverAddr := ":" + strconv.Itoa(conf.Port)
+    if conf.ListenAddress != "0.0.0.0" {
+        serverAddr = conf.ListenAddress + serverAddr
+    }
+    if conf.SSLEnabled {
+        server = &http.Server{
+            Addr: serverAddr,
+            Handler: nil,
+            TLSConfig: &tls.Config{},
+        }
+    } else {
+        server = &http.Server{
+            Addr: serverAddr,
+            Handler: nil,
+        }
     }
     go func() {
         <-done
@@ -95,9 +111,13 @@ func startServer(done chan bool) {
         }
     }()
 
-    fmt.Println("Server starting on port", conf.Port)
-    logger.Logger.Infof("Server starting on port %d", conf.Port)
-    err = server.ListenAndServeTLS(conf.SSLCertPath, conf.SSLKeyPath)
+    fmt.Println("Server starting on", serverAddr)
+    logger.Logger.Infof("Server starting on %s", serverAddr)
+    if conf.SSLEnabled {
+        err = server.ListenAndServeTLS(conf.SSLCertPath, conf.SSLKeyPath)
+    } else {
+        err = server.ListenAndServe()
+    }
     if err != http.ErrServerClosed {
         fmt.Println("Server failed:", err)
         logger.Logger.Infof("Server failed: %s", err)

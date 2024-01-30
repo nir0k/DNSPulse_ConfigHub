@@ -22,7 +22,7 @@ type Claims struct {
 
 
 func GenerateToken(username string) (string, error) {
-    expirationTime := time.Now().Add(5 * time.Minute)
+    expirationTime := time.Now().Add(time.Duration(datastore.GetConfig().WebServer.SesionTimeout) * time.Minute)
     claims := &Claims{
         Username: username,
         StandardClaims: jwt.StandardClaims{

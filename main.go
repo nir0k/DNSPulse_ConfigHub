@@ -50,5 +50,6 @@ func setupAudit() {
 func main() {
 	setup()
 	setupAudit()
+	datastore.LoadSegmentConfigs()
 	web.Webserver()
 }

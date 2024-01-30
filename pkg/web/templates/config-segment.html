@@ -2,6 +2,506 @@
 {{ template "base.html" . }}
 
 {{ define "content" }}
-    <h1>Segment Configuration</h1>
-    <p>This page displays the Segment configuration</p>
+<div class="container mt-4">
+    <h1>Segment Configurations</h1>
+    <p>This page displays the configurations for various segments</p>
+
+    <div class="accordion" id="segmentAccordion">
+        {{ range $name, $config := .Segments }}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{$name}}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{$name}}" aria-expanded="false" aria-controls="collapse{{$name}}">
+                    {{$name}} Configuration
+                </button>
+            </h2>
+            <div id="collapse{{$name}}" class="accordion-collapse collapse" aria-labelledby="heading{{$name}}" data-bs-parent="#segmentAccordion">
+                <div class="accordion-body">
+                    <!-- Segment Edit/Save/Cancel buttons -->
+                    <div class="row mt-2 mb-3">
+                        <div class="col-12">
+                            <button type="button" class="btn btn-primary" onclick="toggleSegmentEditMode('{{$name}}')">Edit Segment</button>
+                            <button type="button" class="btn btn-success" onclick="saveSegmentConfig('{{$name}}')" style="display: none;">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelSegmentEditMode('{{$name}}')" style="display: none;">Cancel</button>
+                        </div>
+                    </div>
+                    <!-- Nested accordion for General and Sync configurations -->
+                    <div class="accordion" id="nestedAccordion{{$name}}">
+                        <!-- General Configuration -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingGeneral{{$name}}">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGeneral{{$name}}" aria-expanded="true" aria-controls="collapseGeneral{{$name}}">
+                                    General
+                                </button>
+                            </h2>
+                            <div id="collapseGeneral{{$name}}" class="accordion-collapse collapse" aria-labelledby="headingGeneral{{$name}}">
+                                <div class="accordion-body">
+                                    <!-- Read-only mode -->
+                                    <div id="generalConfigReadOnly{{$name}}">
+                                        <div class="row mb-2">
+                                            <div class="col-4">Check Interval:</div>
+                                            <div class="col-8">
+                                                <span id="generalConfigCheckInterval{{$name}}">{{ $config.General.CheckInterval }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">Hash:</div>
+                                            <div class="col-8">{{ $config.General.Hash }}</div>
+                                        </div>
+                                    </div>
+                                    <!-- Edit mode (hidden by default) -->
+                                    <div id="generalConfigEditMode{{$name}}" style="display: none;">
+                                        <div class="row mb-2">
+                                            <div class="col-4">Check Interval:</div>
+                                            <div class="col-8">
+                                                <input type="number" class="form-control" id="generalConfigCheckIntervalEdit{{$name}}" value="{{ $config.General.CheckInterval }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Sync Configuration -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingSync{{$name}}">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSync{{$name}}" aria-expanded="true" aria-controls="collapseSync{{$name}}">
+                                    Sync
+                                </button>
+                            </h2>
+                            <div id="collapseSync{{$name}}" class="accordion-collapse collapse" aria-labelledby="headingSync{{$name}}">
+                                <div class="accordion-body">
+                                    <!-- Read-only mode -->
+                                    <div id="syncConfigReadOnly{{$name}}">
+                                        <div class="row mb-2">
+                                            <div class="col-4">Sync Enabled:</div>
+                                            <div class="col-8">
+                                                <input type="checkbox" id="syncEnabledReadOnly{{$name}}" {{ if $config.Sync.IsEnable }}checked{{ end }} disabled>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">Token:</div>
+                                            <div class="col-8">
+                                                <span id="syncConfigToken{{$name}}">{{ $config.Sync.Token }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Edit mode (hidden by default) -->
+                                    <div id="syncConfigEditMode{{$name}}" style="display: none;">
+                                        <div class="row mb-2">
+                                            <div class="col-4">Sync Enabled:</div>
+                                            <div class="col-8">
+                                                <input type="checkbox" id="syncEnabledEdit{{$name}}" {{ if $config.Sync.IsEnable }}checked{{ end }}>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">Token:</div>
+                                            <div class="col-8">
+                                                <input type="text" class="form-control" id="syncConfigTokenEdit{{$name}}" value="{{ $config.Sync.Token }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- ... -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Polling Configuration -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingResolvers{{$name}}">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseResolvers{{$name}}" aria-expanded="true" aria-controls="collapseResolvers{{$name}}">
+                                    Polling
+                                </button>
+                            </h2>
+                            <div id="collapseResolvers{{$name}}" class="accordion-collapse collapse" aria-labelledby="headingResolvers{{$name}}">
+                                <div class="accordion-body">
+                                    <!-- Read-only mode -->
+                                    <div id="pollingConfigReadOnly{{$name}}">
+                                        <div class="row mb-2">
+                                            <div class="col-4">Path:</div>
+                                            <div class="col-8">{{ $config.Polling.Path }}</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">Delimeter:</div>
+                                            <div class="col-8">{{ $config.Polling.Delimeter }}</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">ExtraDelimeter:</div>
+                                            <div class="col-8">{{ $config.Polling.ExtraDelimeter }}</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">PollTimeout:</div>
+                                            <div class="col-8">{{ $config.Polling.PollTimeout }}</div>
+                                        </div>
+                                    </div>
+                                    <!-- Edit mode (hidden by default) -->
+                                    <div id="pollingConfigEditMode{{$name}}" style="display: none;">
+                                        <div class="row mb-2">
+                                            <div class="col-4">Path:</div>
+                                            <div class="col-8">
+                                                <input type="text" class="form-control" id="pollingConfigPathEdit{{$name}}" value="{{ $config.Polling.Path }}">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">Delimeter:</div>
+                                            <div class="col-8">
+                                                <input type="text" class="form-control" id="pollingConfigDelimeterEdit{{$name}}" value="{{ $config.Polling.Delimeter }}">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">ExtraDelimeter:</div>
+                                            <div class="col-8">
+                                                <input type="text" class="form-control" id="pollingConfigExtraDelimeterEdit{{$name}}" value="{{ $config.Polling.ExtraDelimeter }}">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">PollTimeout:</div>
+                                            <div class="col-8">
+                                                <input type="number" class="form-control" id="pollingConfigPollTimeoutEdit{{$name}}" value="{{ $config.Polling.PollTimeout }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Prometheus Configuration -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingProm{{$name}}">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseProm{{$name}}" aria-expanded="true" aria-controls="collapseProm{{$name}}">
+                                    Prometheus
+                                </button>
+                            </h2>
+                            <div id="collapseProm{{$name}}" class="accordion-collapse collapse" aria-labelledby="headingProm{{$name}}">
+                                <div class="accordion-body">
+                                    <!-- Read-only mode -->
+                                    <div id="promConfigReadOnly{{$name}}">
+                                        <div class="row mb-2">
+                                            <div class="col-4">URL:</div>
+                                            <div class="col-8">{{ $config.Prometheus.URL }}</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">AuthEnabled:</div>
+                                            <div class="col-8">
+                                                <input type="checkbox" id="authEnabled{{$name}}" {{ if $config.Prometheus.AuthEnabled }}checked{{ end }} disabled>
+                                            </div>
+                                        </div>
+                                        <div id="authFields{{$name}}" style="{{ if not $config.Prometheus.AuthEnabled }}display: none;{{ end }}">
+                                            <div class="row mb-2">
+                                                <div class="col-4">Username:</div>
+                                                <div class="col-8">{{ $config.Prometheus.Username }}</div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-4">Password:</div>
+                                                <div class="col-8">{{ $config.Prometheus.Password }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">MetricName:</div>
+                                            <div class="col-8">{{ $config.Prometheus.MetricName }}</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">RetriesCount:</div>
+                                            <div class="col-8">{{ $config.Prometheus.RetriesCount }}</div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">BufferSize:</div>
+                                            <div class="col-8">{{ $config.Prometheus.BufferSize }}</div>
+                                        </div>
+                                        <!-- Labels Configuration -->
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="headingLabels{{$name}}">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLabels{{$name}}" aria-expanded="false" aria-controls="collapseLabels{{$name}}">
+                                                    Labels
+                                                </button>
+                                            </h2>
+                                            <div id="collapseLabels{{$name}}" class="accordion-collapse collapse" aria-labelledby="headingLabels{{$name}}">
+                                                <div class="accordion-body">
+                                                    <!-- Read-only mode -->
+                                                    <div id="labelsConfigReadOnly{{$name}}">
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">Opcode:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigOpcode{{$name}}" {{ if $config.Prometheus.Labels.Opcode }}checked{{ end }} disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">Authoritative:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigAuthoritative{{$name}}" {{ if $config.Prometheus.Labels.Authoritative }}checked{{ end }} disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">Truncated:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigTruncated{{$name}}" {{ if $config.Prometheus.Labels.Truncated }}checked{{ end }} disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">Rcode:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigRcode{{$name}}" {{ if $config.Prometheus.Labels.Rcode }}checked{{ end }} disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">RecursionDesired:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigRecursionDesire{{$name}}" {{ if $config.Prometheus.Labels.RecursionDesired }}checked{{ end }} disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">RecursionAvailable:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigRecursionAvailable{{$name}}" {{ if $config.Prometheus.Labels.RecursionAvailable }}checked{{ end }} disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">AuthenticatedData:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigAuthenticatedData{{$name}}" {{ if $config.Prometheus.Labels.AuthenticatedData }}checked{{ end }} disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">CheckingDisabled:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigCheckingDisabled{{$name}}" {{ if $config.Prometheus.Labels.CheckingDisabled }}checked{{ end }} disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">PollingRate:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigPollingRate{{$name}}" {{ if $config.Prometheus.Labels.PollingRate }}checked{{ end }} disabled>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">Recursion:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigRecursion{{$name}}" {{ if $config.Prometheus.Labels.Recursion }}checked{{ end }} disabled>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Add more label configurations here -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- ... other read-only fields ... -->
+                                    </div>
+                                    <!-- Edit mode (hidden by default) -->
+                                    <div id="promConfigEditMode{{$name}}" style="display: none;">
+                                        <div class="row mb-2">
+                                            <div class="col-4">URL:</div>
+                                            <div class="col-8">
+                                                <input type="text" class="form-control" id="promConfigURLEdit{{$name}}" value="{{ $config.Prometheus.URL }}">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">Auth Enabled:</div>
+                                            <div class="col-8">
+                                                <input type="checkbox" id="promConfigAuthEnabledEdit{{$name}}" {{ if $config.Prometheus.AuthEnabled }}checked{{ end }}>
+                                            </div>
+                                        </div>
+                                        <div id="promConfigAuthFieldsEdit{{$name}}" style="{{ if not $config.Prometheus.AuthEnabled }}display: none;{{ end }}">
+                                            <div class="row mb-2">
+                                                <div class="col-4">Username:</div>
+                                                <div class="col-8">
+                                                    <input type="text" class="form-control" id="promConfigUsernameEdit{{$name}}" value="{{ $config.Prometheus.Username }}">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-4">Password:</div>
+                                                <div class="col-8">
+                                                    <input type="password" class="form-control" id="promConfigPasswordEdit{{$name}}" value="{{ $config.Prometheus.Password }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">Metric Name:</div>
+                                            <div class="col-8">
+                                                <input type="text" class="form-control" id="promConfigMetricNameEdit{{$name}}" value="{{ $config.Prometheus.MetricName }}">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">Retries Count:</div>
+                                            <div class="col-8">
+                                                <input type="number" class="form-control" id="promConfigRetriesCountEdit{{$name}}" value="{{ $config.Prometheus.RetriesCount }}">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-2">
+                                            <div class="col-4">Buffer Size:</div>
+                                            <div class="col-8">
+                                                <input type="number" class="form-control" id="promConfigBufferSizeEdit{{$name}}" value="{{ $config.Prometheus.BufferSize }}">
+                                            </div>
+                                        </div>
+                                        <!-- Labels Configuration -->
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="headingLabels{{$name}}">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLabels{{$name}}" aria-expanded="false" aria-controls="collapseLabels{{$name}}">
+                                                    Labels
+                                                </button>
+                                            </h2>
+                                            <div id="collapseLabels{{$name}}" class="accordion-collapse collapse" aria-labelledby="headingLabels{{$name}}">
+                                                <div class="accordion-body">
+                                                    <!-- Edit mode (hidden by default) -->
+                                                    <div id="labelsConfigEditMode{{$name}}" style="display: none;">
+                                                        <!-- Editable fields for label properties -->
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">Opcode:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigOpcodeEdit{{$name}}" {{ if $config.Prometheus.Labels.Opcode }}checked{{ end }}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">Authoritative:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigAuthoritativeEdit{{$name}}" {{ if $config.Prometheus.Labels.Authoritative }}checked{{ end }}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">Truncated:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigTruncatedEdit{{$name}}" {{ if $config.Prometheus.Labels.Truncated }}checked{{ end }}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">Rcode:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigRcodeEdit{{$name}}" {{ if $config.Prometheus.Labels.Rcode }}checked{{ end }}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">RecursionDesired:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigRecursionDesiredEdit{{$name}}" {{ if $config.Prometheus.Labels.RecursionDesired }}checked{{ end }}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">RecursionAvailable:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigRecursionAvailableEdit{{$name}}" {{ if $config.Prometheus.Labels.RecursionAvailable }}checked{{ end }}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">AuthenticatedData:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigAuthenticatedDataEdit{{$name}}" {{ if $config.Prometheus.Labels.AuthenticatedData }}checked{{ end }}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">CheckingDisabled:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigCheckingDisabledEdit{{$name}}" {{ if $config.Prometheus.Labels.CheckingDisabled }}checked{{ end }}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">PollingRate:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigPollingRateEdit{{$name}}" {{ if $config.Prometheus.Labels.PollingRate }}checked{{ end }}>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mb-2">
+                                                            <div class="col-4">Recursion:</div>
+                                                            <div class="col-8">
+                                                                <input type="checkbox" id="labelsConfigRecursionEdit{{$name}}" {{ if $config.Prometheus.Labels.Recursion }}checked{{ end }}>
+                                                            </div>
+                                                        </div>
+                                                        <!-- ... other editable fields for label properties ... -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- ... other editable fields ... -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Add more nested groups if needed -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+</div>
+
+<script>
+    function toggleAuthFields(segmentName) {
+        var checkBox = document.getElementById('authEnabled' + segmentName);
+        var authFields = document.getElementById('authFields' + segmentName);
+        if (checkBox.checked) {
+            authFields.style.display = 'block';
+        } else {
+            authFields.style.display = 'none';
+        }
+    }
+    function toggleSegmentEditMode(segmentName) {
+        var segment = document.getElementById('collapse' + segmentName);
+        var editModeDivs = segment.querySelectorAll('[id$="EditMode' + segmentName + '"]');
+        var readOnlyDivs = segment.querySelectorAll('[id$="ReadOnly' + segmentName + '"]');
+        var editButton = segment.querySelector('.btn-primary');
+        var saveCancelButtonContainer = segment.querySelectorAll('.btn-success, .btn-secondary');
+    
+        editModeDivs.forEach(div => div.style.display = 'block');
+        readOnlyDivs.forEach(div => div.style.display = 'none');
+    
+        editButton.style.display = 'none';
+        saveCancelButtonContainer.forEach(button => button.style.display = 'inline-block');
+    }
+    
+    
+
+    function saveSegmentConfig(segmentName) {
+        // Retrieve values from the form inputs
+        var generalCheckInterval = document.getElementById('generalConfigCheckIntervalEdit' + segmentName).value;
+        var syncEnabled = document.getElementById('syncEnabledEdit' + segmentName).checked;
+        var syncToken = document.getElementById('syncConfigTokenEdit' + segmentName).value;
+        // ... retrieve other values similarly ...
+        var pollingPath = document.getElementById('pollingConfigPathEdit' + segmentName).value;
+        var pollingDelimeter = document.getElementById('pollingConfigDelimeterEdit' + segmentName).value;
+        var pollingExtraDElimeter = document.getElementById('pollingConfigExtraDelimeterEdit' + segmentName).value;
+        var pollingPollTimeout = document.getElementById('pollingConfigPollTimeoutEdit' + segmentName).value;
+    
+        // (Optional) Validate the input values
+        // if (!validateInput(generalCheckInterval, syncEnabled, syncToken, ...)) {
+        //     alert('Invalid input');
+        //     return;
+        // }
+    
+        // Prepare data to be sent to the server
+        var data = {
+            generalCheckInterval: generalCheckInterval,
+            syncEnabled: syncEnabled,
+            syncToken: syncToken,
+            // ... include other values ...
+        };
+    
+        // Send data to the server (Example using fetch API)
+        // Replace '/api/save-config' with your actual API endpoint
+        fetch('/api/save-config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            // Call cancelSegmentEditMode to revert back to the read-only view
+            cancelSegmentEditMode(segmentName);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+    
+
+    function cancelSegmentEditMode(segmentName) {
+        var segment = document.getElementById('collapse' + segmentName);
+        var editModeDivs = segment.querySelectorAll('[id$="EditMode' + segmentName + '"]');
+        var readOnlyDivs = segment.querySelectorAll('[id$="ReadOnly' + segmentName + '"]');
+        var editButton = segment.querySelector('.btn-primary');
+        var saveCancelButtonContainer = segment.querySelectorAll('.btn-success, .btn-secondary');
+
+        editModeDivs.forEach(div => div.style.display = 'none');
+        readOnlyDivs.forEach(div => div.style.display = 'block');
+        editButton.style.display = 'inline-block';
+        saveCancelButtonContainer.forEach(button => button.style.display = 'none');
+    }
+</script>
 {{ end }}

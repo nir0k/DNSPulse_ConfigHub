@@ -46,7 +46,7 @@ type WebServerConfigStruct struct {
 	Password 		string	`yaml:"password" json:"password"`
 }
 
-type SegmentConfigStruct struct {
+type SegmentConfigsStruct struct {
 	Name	string	`yaml:"name"`
 	Path	string	`yaml:"path"`
 }
@@ -56,7 +56,7 @@ type ConfigStruct struct {
 	Log				LogAppConfigStruct 
 	Audit			LogAuditConfigStruct	`yaml:"Audit"`
 	WebServer		WebServerConfigStruct	`yaml:"WebServer"`
-	SegmentConfigs	[]SegmentConfigStruct	`yaml:"Configs"`
+	SegmentConfigs	[]SegmentConfigsStruct	`yaml:"Configs"`
 }
 
 type HashStruct struct {

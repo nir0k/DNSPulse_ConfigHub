@@ -1,1 +1,16 @@
 /* custom.css */
+.position-relative {
+    position: relative;
+}
+
+.password-input {
+    padding-right: 30px;
+}
+
+.password-icon {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}

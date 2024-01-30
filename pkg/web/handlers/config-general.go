@@ -120,6 +120,9 @@ func UpdateWebServerConfigHandler(w http.ResponseWriter, r *http.Request) {
 
     // Update the configuration in your datastore (datastore.UpdateGeneralConfig)
 	newConf := datastore.GetConfig()
+    if updatedConfig.Data.Password == "" {
+        updatedConfig.Data.Password = newConf.WebServer.Password
+    }
 	newConf.WebServer = updatedConfig.Data
     if err := datastore.UpdateConfig(*newConf); err != nil {
         http.Error(w, "Failed to update web-server configuration: "+err.Error(), http.StatusInternalServerError)

@@ -309,7 +309,7 @@
                         <div class="row mb-2">
                             <div class="col-4">Password:</div>
                             <div class="col-8">
-                                <span id="webServerConfigPassword">{{ .Config.WebServer.Password }}</span>
+                                <span id="webServerConfigPassword">*******</span>
                             </div>
                         </div>
                         <!-- Add more read-only parameters here if needed -->
@@ -369,8 +369,9 @@
                         </div>
                         <div class="row mb-2">
                             <div class="col-4">Password:</div>
-                            <div class="col-8">
-                                <input type="text" class="form-control" id="webServerConfigPasswordEdit" value="{{ .Config.WebServer.Password }}">
+                            <div class="col-8 position-relative">
+                                <input type="password" class="form-control password-input" id="webServerConfigPasswordEdit" value="">
+                                <i class="fas fa-eye password-icon" onclick="togglePasswordVisibility()" id="passwordEyeIcon" style="display: none;"></i>
                             </div>
                         </div>
                         <!-- Add more editable parameters here if needed -->
@@ -380,6 +381,59 @@
                                 <button type="button" class="btn btn-secondary" onclick="cancelEditMode('webServerConfig')">Cancel</button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Segment Configurations -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSegmentConfig">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSegmentConfig" aria-expanded="false" aria-controls="collapseSegmentConfig">
+                    Segment Configurations
+                </button>
+            </h2>
+            <div id="collapseSegmentConfig" class="accordion-collapse collapse" aria-labelledby="headingSegmentConfig" data-bs-parent="#configAccordion">
+                <div class="accordion-body">
+                    <!-- Read-only mode -->
+                    <div id="segmentConfigReadOnly">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Path</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{ range $index, $element := .Config.SegmentConfigs }}
+                                <tr>
+                                    <th scope="row">{{ $index }}</th>
+                                    <td>{{ $element.Name }}</td>
+                                    <td>{{ $element.Path }}</td>
+                                </tr>
+                                {{ end }}
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-primary" onclick="toggleSegmentEditMode()">Edit</button>
+                    </div>
+
+                    <!-- Edit mode (hidden by default) -->
+                    <div id="segmentConfigEditMode" style="display: none;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Path</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="segmentConfigEditTableBody">
+                                <!-- Dynamically populated by JavaScript -->
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-success" onclick="saveSegmentConfig()">Save</button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelSegmentEditMode()">Cancel</button>
                     </div>
                 </div>
             </div>
@@ -431,6 +485,30 @@
             sslCertificateFields.style.display = 'none';
         }
     }
+
+    function togglePasswordVisibility() {
+        var passwordInput = document.getElementById("webServerConfigPasswordEdit");
+        var passwordEyeIcon = document.getElementById("passwordEyeIcon");
+    
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            passwordEyeIcon.classList.remove("fa-eye");
+            passwordEyeIcon.classList.add("fa-eye-slash");
+        } else {
+            passwordInput.type = "password";
+            passwordEyeIcon.classList.remove("fa-eye-slash");
+            passwordEyeIcon.classList.add("fa-eye");
+        }
+    }
+    
+    document.getElementById("webServerConfigPasswordEdit").addEventListener("input", function() {
+        var passwordEyeIcon = document.getElementById("passwordEyeIcon");
+        if (this.value) {
+            passwordEyeIcon.style.display = "block";
+        } else {
+            passwordEyeIcon.style.display = "none";
+        }
+    });
     
     function cancelEditMode(section) {
         var readOnlySection = document.getElementById(section + 'ReadOnly');
@@ -453,8 +531,6 @@
         }
     }
     
-    
-
     function saveGeneralConfig() {
         // Retrieve the modified value from the input field
         var generalConfigPath = document.getElementById('generalConfigPathEdit').value;
@@ -612,6 +688,12 @@
                 password: webServerConfigPassword
             }
         };
+
+        // Only add the password to the updated configuration if it's been changed
+        if (webServerConfigPassword !== "") {
+            updatedConfig.data.password = webServerConfigPassword;
+        }
+        
         // Send the updated configuration to the server
         fetch('/update-webserver-config', {
             method: 'POST',
@@ -646,5 +728,7 @@
             alert('An error occurred while updating web-server configuration.');
         });
     }
+    
+    
 </script>
 {{ end }}
