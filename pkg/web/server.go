@@ -60,6 +60,7 @@ func setup() error {
     http.HandleFunc("/update-audit-config", handlers.AuthMiddleware(handlers.UpdateAuditConfigHandler))
     http.HandleFunc("/update-webserver-config", handlers.AuthMiddleware(handlers.UpdateWebServerConfigHandler))
     http.HandleFunc("/config/segment", handlers.AuthMiddleware(handlers.ConfigSegmentHandler(configSegmentTemplate)))
+    http.HandleFunc("/update-segment-config", handlers.AuthMiddleware(handlers.UpdateSegmentConfigHandler))
     http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
     
     return nil

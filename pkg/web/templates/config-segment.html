@@ -11,7 +11,7 @@
         <div class="accordion-item">
             <h2 class="accordion-header" id="heading{{$name}}">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{$name}}" aria-expanded="false" aria-controls="collapse{{$name}}">
-                    {{$name}} Configuration
+                    {{$name}}
                 </button>
             </h2>
             <div id="collapse{{$name}}" class="accordion-collapse collapse" aria-labelledby="heading{{$name}}" data-bs-parent="#segmentAccordion">
@@ -446,33 +446,74 @@
     
 
     function saveSegmentConfig(segmentName) {
-        // Retrieve values from the form inputs
-        var generalCheckInterval = document.getElementById('generalConfigCheckIntervalEdit' + segmentName).value;
+        var generalCheckInterval = parseInt(document.getElementById('generalConfigCheckIntervalEdit' + segmentName).value, 10);
         var syncEnabled = document.getElementById('syncEnabledEdit' + segmentName).checked;
         var syncToken = document.getElementById('syncConfigTokenEdit' + segmentName).value;
-        // ... retrieve other values similarly ...
+    
         var pollingPath = document.getElementById('pollingConfigPathEdit' + segmentName).value;
         var pollingDelimeter = document.getElementById('pollingConfigDelimeterEdit' + segmentName).value;
-        var pollingExtraDElimeter = document.getElementById('pollingConfigExtraDelimeterEdit' + segmentName).value;
-        var pollingPollTimeout = document.getElementById('pollingConfigPollTimeoutEdit' + segmentName).value;
-    
-        // (Optional) Validate the input values
-        // if (!validateInput(generalCheckInterval, syncEnabled, syncToken, ...)) {
-        //     alert('Invalid input');
-        //     return;
-        // }
-    
+        var pollingExtraDelimeter = document.getElementById('pollingConfigExtraDelimeterEdit' + segmentName).value;
+        var pollingPollTimeout = parseInt(document.getElementById('pollingConfigPollTimeoutEdit' + segmentName).value, 10);
+
+        var promUrl = document.getElementById('promConfigURLEdit' + segmentName).value;
+        var promAuthEnabled = document.getElementById('promConfigAuthEnabledEdit' + segmentName).checked;
+        var promUsername = document.getElementById('promConfigUsernameEdit' + segmentName).value;
+        var promPassword = document.getElementById('promConfigPasswordEdit' + segmentName).value;
+        var promMetricName = document.getElementById('promConfigMetricNameEdit' + segmentName).value;
+        var promRetriesCount = parseInt(document.getElementById('promConfigRetriesCountEdit' + segmentName).value, 10);
+        var promBufferSize = parseInt(document.getElementById('promConfigBufferSizeEdit' + segmentName).value, 10);
+        
+        var promLabelOpcode = document.getElementById('labelsConfigOpcodeEdit' + segmentName).checked;
+        var promLabelAuthoritative = document.getElementById('labelsConfigAuthoritativeEdit' + segmentName).checked;
+        var promLabelTruncated = document.getElementById('labelsConfigTruncatedEdit' + segmentName).checked;
+        var promLabelRcode = document.getElementById('labelsConfigRcodeEdit' + segmentName).checked;
+        var promLabelRecursionDesired = document.getElementById('labelsConfigRecursionEdit' + segmentName).checked;
+        var promLabelRecursionAvailable = document.getElementById('labelsConfigRecursionAvailableEdit' + segmentName).checked;
+        var promLabelAuthenticatedData = document.getElementById('labelsConfigAuthenticatedDataEdit' + segmentName).checked;
+        var promLabelCheckingDisabled = document.getElementById('labelsConfigCheckingDisabledEdit' + segmentName).checked;
+        var promLabelPollingRate = document.getElementById('labelsConfigPollingRateEdit' + segmentName).checked;
+        var promLabelRecursion = document.getElementById('labelsConfigRecursionEdit' + segmentName).checked;
+
         // Prepare data to be sent to the server
         var data = {
-            generalCheckInterval: generalCheckInterval,
-            syncEnabled: syncEnabled,
-            syncToken: syncToken,
-            // ... include other values ...
+            SegmentName: segmentName,
+            General: {
+                confCheckInterval: generalCheckInterval,
+            },
+            Sync: {
+                isEnable: syncEnabled,
+                token: syncToken,
+            },
+            Resolvers: {
+                path: pollingPath,
+                delimeter: pollingDelimeter,
+                extraDelimeter: pollingExtraDelimeter,
+                pullTimeout: pollingPollTimeout,
+            },
+            Prometheus: {
+                url: promUrl,
+                auth: promAuthEnabled,
+                username: promUsername,
+                password: promPassword,
+                metricName: promMetricName,
+                retriesCount: promRetriesCount,
+                buferSize: promBufferSize,
+                labels: {
+                    opcode: promLabelOpcode,
+                    authoritative: promLabelAuthoritative,
+                    truncated: promLabelTruncated,
+                    rcode: promLabelRcode,
+                    recursionDesired: promLabelRecursionDesired,
+                    recursionAvailable: promLabelRecursionAvailable,
+                    authenticatedData: promLabelAuthenticatedData,
+                    checkingDisabled: promLabelCheckingDisabled,
+                    pollingRate: promLabelPollingRate,
+                    recursion: promLabelRecursion,
+                },
+            },
         };
     
-        // Send data to the server (Example using fetch API)
-        // Replace '/api/save-config' with your actual API endpoint
-        fetch('/api/save-config', {
+        fetch('/update-segment-config', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -490,7 +531,6 @@
         });
     }
     
-
     function cancelSegmentEditMode(segmentName) {
         var segment = document.getElementById('collapse' + segmentName);
         var editModeDivs = segment.querySelectorAll('[id$="EditMode' + segmentName + '"]');
