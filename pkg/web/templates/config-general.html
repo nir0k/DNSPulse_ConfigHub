@@ -2,10 +2,28 @@
 {{ template "base.html" . }}
 
 {{ define "content" }}
+<div aria-live="polite" aria-atomic="true" class="position-relative">
+    <div class="toast-container position-absolute top-0 end-0 p-3" id="toastContainer">
+      <!-- Toasts will be dynamically added here -->
+    </div>
+</div>
 <div class="container mt-4">
     <h1>General Configuration</h1>
     <p>This page displays the main DataHub configuration</p>
+    <div class="input-group mb-3">
+        <p class="d-inline-flex gap-1" id="downloadUploadContainer">
+            <a href="/config/download" class="btn btn-info">Download Config</a>                 
+            <form id="uploadForm" enctype="multipart/form-data" class="mb-3">
+                <div class="input-group">
+                    <label class="input-group-text" for="configFile">Upload</label>
+                    <input type="file" class="form-control" id="configFile" name="configFile">
+                    <button type="button" id="uploadButton" class="btn btn-warning">Submit</button>
+                </div>
+            </form>
+            
+        </p>
 
+    </div>
     <!-- General Config -->
     <div class="accordion" id="configAccordion">
         <div class="accordion-item">
@@ -536,7 +554,7 @@
         var generalConfigPath = document.getElementById('generalConfigPathEdit').value;
         var updatedConfig = { general: { path: generalConfigPath } };
 
-        fetch('/update-general-config', {
+        fetch('/config/general/update-general', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatedConfig),
@@ -581,7 +599,7 @@
             }
         };
         // Send the updated configuration to the server
-        fetch('/update-log-config', {
+        fetch('/config/general/update-log', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -632,7 +650,7 @@
             }
         };
         // Send the updated configuration to the server
-        fetch('/update-audit-config', {
+        fetch('/config/general/update-audit', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -695,7 +713,7 @@
         }
         
         // Send the updated configuration to the server
-        fetch('/update-webserver-config', {
+        fetch('/config/general/update-webserver', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -727,6 +745,46 @@
             console.error('Error:', error);
             alert('An error occurred while updating web-server configuration.');
         });
+    }
+    
+    document.getElementById('uploadButton').addEventListener('click', function() {
+        var form = document.getElementById('uploadForm');
+        var formData = new FormData(form);
+    
+        fetch('/config/upload', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            showToast('File uploaded successfully', 'bg-success');
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            showToast('Failed to upload file', 'bg-danger');
+        });
+    });
+    
+    function showToast(message, className) {
+        var toastContainer = document.getElementById('toastContainer');
+        var toast = document.createElement('div');
+        toast.className = `toast ${className} text-white` ;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+    
+        toastContainer.appendChild(toast);
+        var bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
     }
     
     

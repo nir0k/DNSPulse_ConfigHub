@@ -55,12 +55,19 @@ func setup() error {
     http.Handle("/", handlers.AuthMiddleware(handlers.HomeHandler(indexTemplate)))
     http.HandleFunc("/login", handlers.LoginHandler(loginTemplate))
     http.HandleFunc("/config/general", handlers.AuthMiddleware(handlers.ConfigGeneralHandler(configGeneralTemplate)))
-    http.HandleFunc("/update-general-config", handlers.AuthMiddleware(handlers.UpdateGeneralConfigHandler))
-    http.HandleFunc("/update-log-config", handlers.AuthMiddleware(handlers.UpdateLogConfigHandler))
-    http.HandleFunc("/update-audit-config", handlers.AuthMiddleware(handlers.UpdateAuditConfigHandler))
-    http.HandleFunc("/update-webserver-config", handlers.AuthMiddleware(handlers.UpdateWebServerConfigHandler))
+    http.HandleFunc("/config/general/update-general", handlers.AuthMiddleware(handlers.UpdateGeneralConfigHandler))
+    http.HandleFunc("/config/general/update-log", handlers.AuthMiddleware(handlers.UpdateLogConfigHandler))
+    http.HandleFunc("/config/general/update-audit", handlers.AuthMiddleware(handlers.UpdateAuditConfigHandler))
+    http.HandleFunc("/config/general/update-webserver", handlers.AuthMiddleware(handlers.UpdateWebServerConfigHandler))
     http.HandleFunc("/config/segment", handlers.AuthMiddleware(handlers.ConfigSegmentHandler(configSegmentTemplate)))
     http.HandleFunc("/update-segment-config", handlers.AuthMiddleware(handlers.UpdateSegmentConfigHandler))
+    
+    http.HandleFunc("/download-segment-config", handlers.AuthMiddleware(handlers.DownloadSegmentConfigHandler))
+    http.HandleFunc("/upload-segment-config", handlers.AuthMiddleware(handlers.UploadSegmentConfigHandler))
+
+    http.HandleFunc("/config/download", handlers.AuthMiddleware(handlers.DownloadConfigHandler))
+    http.HandleFunc("/config/upload", handlers.AuthMiddleware(handlers.UploadConfigHandler))
+
     http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
     
     return nil

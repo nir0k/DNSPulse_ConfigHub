@@ -143,13 +143,7 @@ func UpdateSegmentConfig(newConf SegmentConfStruct) error {
 }
 
 func SaveSegmentConfigToFile(segmentConfig SegmentConfStruct) (string, error) {
-	var filePath string
-	for _, s := range GetConfig().SegmentConfigs {
-		if s.Name == segmentConfig.SegmentName {
-			filePath = s.Path
-			break
-		}
-	}
+	filePath := GetSegmentConfigFilePath(segmentConfig.SegmentName)
 	if filePath != "" {
 		configMutex.RLock()
 		defer configMutex.RUnlock()
@@ -166,4 +160,13 @@ func SaveSegmentConfigToFile(segmentConfig SegmentConfStruct) (string, error) {
 		return filePath, os.Rename(tempFile, filePath)
 	}
 	return "", fmt.Errorf("failed to search segment '%s' config file path", segmentConfig.SegmentName)
+}
+
+func GetSegmentConfigFilePath(segmentName string) string {
+	for _, s := range GetConfig().SegmentConfigs {
+		if s.Name == segmentName {
+			return s.Path
+		}
+	}
+	return ""
 }

@@ -18,11 +18,24 @@
                 <div class="accordion-body">
                     <!-- Segment Edit/Save/Cancel buttons -->
                     <div class="row mt-2 mb-3">
+                        <div class="input-group mb-3">
+                            <p class="d-inline-flex gap-1" id="downloadUploadContainer{{$name}}">
+                                <a href="/download-segment-config?segment={{$name}}" class="btn btn-info">Download Config</a>                    
+                                <form action="/upload-config?segment={{$name}}" method="post" enctype="multipart/form-data" class="mb-3">
+                                    <div class="input-group">
+                                        <label class="input-group-text" for="inputGroupFile{{$name}}">Upload</label>
+                                        <input type="file" class="form-control" id="inputGroupFile{{$name}}" name="configFile">
+                                        <button type="submit" class="btn btn-warning">Submit</button>
+                                    </div>
+                                </form>
+                            </p>
+                        </div>
                         <div class="col-12">
                             <button type="button" class="btn btn-primary" onclick="toggleSegmentEditMode('{{$name}}')">Edit Segment</button>
                             <button type="button" class="btn btn-success" onclick="saveSegmentConfig('{{$name}}')" style="display: none;">Save Changes</button>
                             <button type="button" class="btn btn-secondary" onclick="cancelSegmentEditMode('{{$name}}')" style="display: none;">Cancel</button>
                         </div>
+
                     </div>
                     <!-- Nested accordion for General and Sync configurations -->
                     <div class="accordion" id="nestedAccordion{{$name}}">
@@ -542,6 +555,24 @@
         readOnlyDivs.forEach(div => div.style.display = 'block');
         editButton.style.display = 'inline-block';
         saveCancelButtonContainer.forEach(button => button.style.display = 'none');
+    }
+    function uploadSegmentConfig(segmentName) {
+        var fileInput = document.getElementById('fileInput' + segmentName);
+        var file = fileInput.files[0];
+        var formData = new FormData();
+        formData.append('configFile', file);
+
+        fetch('/upload-segment-config?segment=' + segmentName, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
     }
 </script>
 {{ end }}

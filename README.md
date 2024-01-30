@@ -5,6 +5,5 @@ Need to Add:
 - Reload config from file
 - gRPS
 - Audit
-- Config for watcher for each segment
-- RestApi for Get config
+- add list of servers
 - Docs
