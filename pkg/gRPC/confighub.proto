@@ -72,10 +72,15 @@ message Csv {
     string serviceMode = 13;
 }
 
+// Define a message to hold a list of Csv messages
+message CsvList {
+    repeated Csv csvs = 1;
+}
+
 // Define the service
 service ConfigHubService {
     rpc GetSegmentConfig(GetSegmentConfigRequest) returns (SegmentConfStruct);
-    rpc GetCsv(GetCsvRequest) returns (Csv);
+    rpc GetCsv(GetCsvRequest) returns (CsvList); // Updated to return CsvList
 }
 
 // Request message for GetSegmentConfig

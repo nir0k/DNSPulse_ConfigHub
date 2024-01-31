@@ -28,7 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ConfigHubServiceClient interface {
 	GetSegmentConfig(ctx context.Context, in *GetSegmentConfigRequest, opts ...grpc.CallOption) (*SegmentConfStruct, error)
-	GetCsv(ctx context.Context, in *GetCsvRequest, opts ...grpc.CallOption) (*Csv, error)
+	GetCsv(ctx context.Context, in *GetCsvRequest, opts ...grpc.CallOption) (*CsvList, error)
 }
 
 type configHubServiceClient struct {
@@ -48,8 +48,8 @@ func (c *configHubServiceClient) GetSegmentConfig(ctx context.Context, in *GetSe
 	return out, nil
 }
 
-func (c *configHubServiceClient) GetCsv(ctx context.Context, in *GetCsvRequest, opts ...grpc.CallOption) (*Csv, error) {
-	out := new(Csv)
+func (c *configHubServiceClient) GetCsv(ctx context.Context, in *GetCsvRequest, opts ...grpc.CallOption) (*CsvList, error) {
+	out := new(CsvList)
 	err := c.cc.Invoke(ctx, ConfigHubService_GetCsv_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func (c *configHubServiceClient) GetCsv(ctx context.Context, in *GetCsvRequest, 
 // for forward compatibility
 type ConfigHubServiceServer interface {
 	GetSegmentConfig(context.Context, *GetSegmentConfigRequest) (*SegmentConfStruct, error)
-	GetCsv(context.Context, *GetCsvRequest) (*Csv, error)
+	GetCsv(context.Context, *GetCsvRequest) (*CsvList, error)
 	mustEmbedUnimplementedConfigHubServiceServer()
 }
 
@@ -73,7 +73,7 @@ type UnimplementedConfigHubServiceServer struct {
 func (UnimplementedConfigHubServiceServer) GetSegmentConfig(context.Context, *GetSegmentConfigRequest) (*SegmentConfStruct, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSegmentConfig not implemented")
 }
-func (UnimplementedConfigHubServiceServer) GetCsv(context.Context, *GetCsvRequest) (*Csv, error) {
+func (UnimplementedConfigHubServiceServer) GetCsv(context.Context, *GetCsvRequest) (*CsvList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCsv not implemented")
 }
 func (UnimplementedConfigHubServiceServer) mustEmbedUnimplementedConfigHubServiceServer() {}

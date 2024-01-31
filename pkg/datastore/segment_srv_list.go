@@ -114,10 +114,11 @@ func readResolversFromCSV(segment SegmentConfigsStruct, conf PollingConfigStruct
     return nil
 }
 
-func GetPollingHostsBySegment(segmentName string) []Csv {
+func GetPollingHostsBySegment(segmentName string) ([]Csv, bool) {
     pollingHostsMutex.RLock()
     defer pollingHostsMutex.RUnlock()
-    return pollingCSV[segmentName]
+    hosts, ok := pollingCSV[segmentName]
+    return hosts, ok
 }
 
 func GetPollingHosts() *pollingCSVMap {

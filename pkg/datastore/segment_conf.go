@@ -123,10 +123,11 @@ func GetSegmentsConfig() *SegmentsMap {
     return &segmentsConfig
 }
 
-func GetSegmentsConfigBySEgment(segmentName string) SegmentConfStruct {
+func GetSegmentsConfigBySegment(segmentName string) (SegmentConfStruct, bool) {
     segmentConfigMutex.RLock()
     defer segmentConfigMutex.RUnlock()
-    return segmentsConfig[segmentName]
+    config, ok := segmentsConfig[segmentName]
+    return config, ok
 }
 
 func GetSegmentsPollingConfigbySegment(segmentName string) PollingConfigStruct{
