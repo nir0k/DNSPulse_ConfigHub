@@ -40,6 +40,7 @@
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <li><a class="dropdown-item" href="/config/general">General</a></li>
                                     <li><a class="dropdown-item" href="/config/segment">Segments</a></li>
+                                    <li><a class="dropdown-item" href="/config/polling">Polling</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item">
@@ -71,6 +72,11 @@
         </nav>
         {{ end }}
     </header>
+    <div aria-live="polite" aria-atomic="true" class="position-relative">
+        <div class="toast-container position-absolute top-0 end-0 p-3" id="toastContainer">
+          <!-- Toasts will be dynamically added here -->
+        </div>
+    </div>
 
     {{ block "content" . }}{{ end }}
 

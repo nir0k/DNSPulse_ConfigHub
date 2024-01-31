@@ -1,9 +1,9 @@
 segmentname: PROD-SRV-CS
 General:
-  confCheckInterval: 4
+  confCheckInterval: 1
 Sync:
   isEnable: true
-  token: fvdknlvd9ergtuklroegkvnemc90ru34fcemf340[ij
+  token: SecretToken
 Prometheus:
   url: http://prometheus:8428/api/v1/write
   auth: false
@@ -24,7 +24,7 @@ Prometheus:
     pollingRate: false
     recursion: true
 Resolvers:
-  path: configs/prod_srv_cs_srv.csv
+  path: config/segment-config-example.csv
   delimeter: ','
   extraDelimeter: '&'
-  pullTimeout: 3
+  pullTimeout: 1

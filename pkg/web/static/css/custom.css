@@ -14,3 +14,7 @@
     transform: translateY(-50%);
     cursor: pointer;
 }
+
+.edit-mode {
+    min-width: 200px; /* Adjust as needed */
+}

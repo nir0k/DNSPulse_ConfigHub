@@ -12,7 +12,6 @@ import (
 	"io/fs"
 	"net/http"
 	"strconv"
-	// "text/template"
     "html/template"
 )
 
@@ -24,6 +23,7 @@ var (
     loginTemplate *template.Template
     configGeneralTemplate *template.Template
     configSegmentTemplate *template.Template
+    pollingSegmentTemplate *template.Template
 )
 
 func setup() error {
@@ -52,21 +52,30 @@ func setup() error {
         return fmt.Errorf("failed parsing config-segment template: %v", err)
     }
 
+    pollingSegmentTemplate, err = template.ParseFS(tmplFS, "templates/config-polling.html", "templates/base.html")
+    if err != nil {
+        return fmt.Errorf("failed parsing config-polling template: %v", err)
+    }
+
     http.Handle("/", handlers.AuthMiddleware(handlers.HomeHandler(indexTemplate)))
     http.HandleFunc("/login", handlers.LoginHandler(loginTemplate))
+    
     http.HandleFunc("/config/general", handlers.AuthMiddleware(handlers.ConfigGeneralHandler(configGeneralTemplate)))
     http.HandleFunc("/config/general/update-general", handlers.AuthMiddleware(handlers.UpdateGeneralConfigHandler))
     http.HandleFunc("/config/general/update-log", handlers.AuthMiddleware(handlers.UpdateLogConfigHandler))
     http.HandleFunc("/config/general/update-audit", handlers.AuthMiddleware(handlers.UpdateAuditConfigHandler))
     http.HandleFunc("/config/general/update-webserver", handlers.AuthMiddleware(handlers.UpdateWebServerConfigHandler))
-    http.HandleFunc("/config/segment", handlers.AuthMiddleware(handlers.ConfigSegmentHandler(configSegmentTemplate)))
-    http.HandleFunc("/update-segment-config", handlers.AuthMiddleware(handlers.UpdateSegmentConfigHandler))
+    http.HandleFunc("/config/general/download", handlers.AuthMiddleware(handlers.DownloadConfigHandler))
+    http.HandleFunc("/config/general/upload", handlers.AuthMiddleware(handlers.DownloadConfigHandler))
     
-    http.HandleFunc("/download-segment-config", handlers.AuthMiddleware(handlers.DownloadSegmentConfigHandler))
-    http.HandleFunc("/upload-segment-config", handlers.AuthMiddleware(handlers.UploadSegmentConfigHandler))
+    http.HandleFunc("/config/segment", handlers.AuthMiddleware(handlers.ConfigSegmentHandler(configSegmentTemplate)))
+    http.HandleFunc("/config/segment/update", handlers.AuthMiddleware(handlers.UpdateSegmentConfigHandler))
+    http.HandleFunc("/config/segment/download", handlers.AuthMiddleware(handlers.DownloadSegmentConfigHandler))
+    http.HandleFunc("/config/segment/upload", handlers.AuthMiddleware(handlers.UploadSegmentConfigHandler))
 
-    http.HandleFunc("/config/download", handlers.AuthMiddleware(handlers.DownloadConfigHandler))
-    http.HandleFunc("/config/upload", handlers.AuthMiddleware(handlers.UploadConfigHandler))
+    http.HandleFunc("/config/polling", handlers.AuthMiddleware(handlers.PollingSegmentHandler(pollingSegmentTemplate)))
+    http.HandleFunc("/config/polling/file", handlers.AuthMiddleware(handlers.FileHandler))
+    http.HandleFunc("/config/polling/update", handlers.AuthMiddleware(handlers.UpdateSegmentDataHandler))
 
     http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
     

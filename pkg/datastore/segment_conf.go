@@ -66,13 +66,13 @@ type SegmentsMap map[string]SegmentConfStruct
 
 var (
 	// segmentConfigFile		string
-	segmentConfig			SegmentsMap
+	segmentsConfig			SegmentsMap
 	segmentConfigMutex 		sync.RWMutex
 	// segmentLastConfigHash 	HashStruct
 )
 
 func init() {
-	segmentConfig = make(map[string]SegmentConfStruct)
+	segmentsConfig = make(map[string]SegmentConfStruct)
 }
 
 func LoadSegmentConfigs() error {
@@ -93,7 +93,7 @@ func loadSegmentConfig(s SegmentConfigsStruct) (bool, error) {
         logger.Logger.Errorf("Error Calculate hash to file '%s' (segment: %s) err: %v\n", s.Path, s.Name, err)
         return false, err
     }
-    if segmentConfig[s.Name].General.Hash == newHash {
+    if segmentsConfig[s.Name].General.Hash == newHash {
         logger.Logger.Debugf("Configuration for %s has not been changed", s.Name)
         return false, nil
     }
@@ -108,11 +108,11 @@ func loadSegmentConfig(s SegmentConfigsStruct) (bool, error) {
 	// newConfig.General.Path = configFile
 	newConfig.General.Hash = newHash
 	segmentConfigMutex.Lock()
-    segmentConfig[s.Name] = newConfig
+    segmentsConfig[s.Name] = newConfig
     segmentConfigMutex.Unlock()
 	// segmentLastConfigHash.LastHash = newHash
     // segmentLastConfigHash.LastUpdate = time.Now().Unix()
-	logger.Logger.Debugf("Configurations for segment %s: %v\n", s.Name, segmentConfig[s.Name])
+	logger.Logger.Debugf("Configurations for segment %s: %v\n", s.Name, segmentsConfig[s.Name])
 
     return true, nil
 }
@@ -120,12 +120,19 @@ func loadSegmentConfig(s SegmentConfigsStruct) (bool, error) {
 func GetSegmentsConfig() *SegmentsMap {
     segmentConfigMutex.RLock()
     defer segmentConfigMutex.RUnlock()
-    return &segmentConfig
+    return &segmentsConfig
+}
+
+func GetSegmentsPollingConfigbySegment(segmentName string) PollingConfigStruct{
+    segmentConfigMutex.RLock()
+    defer segmentConfigMutex.RUnlock()
+	conf := segmentsConfig[segmentName]
+	return conf.Polling
 }
 
 func UpdateSegmentConfig(newConf SegmentConfStruct) error {
-	configMutex.RLock()
-    defer configMutex.RUnlock()
+	segmentConfigMutex.RLock()
+    defer segmentConfigMutex.RUnlock()
 	filePath, err := SaveSegmentConfigToFile(newConf)
 	if err != nil {
 		logger.Logger.Errorf("failure to save segment '%s' config into file, err: %v", newConf.SegmentName, err)
@@ -137,7 +144,7 @@ func UpdateSegmentConfig(newConf SegmentConfStruct) error {
 		return err
 	}
 	newConf.General.Hash = newHash
-	segmentConfig[newConf.SegmentName] = newConf
+	segmentsConfig[newConf.SegmentName] = newConf
 	logger.Logger.Debugf("Succesfuly to calculate hash for segment '%s' config into file, err: %v", newConf.SegmentName, err)
 	return nil
 }
@@ -169,4 +176,12 @@ func GetSegmentConfigFilePath(segmentName string) string {
 		}
 	}
 	return ""
+}
+
+func UpdatePollingHash(segmentName string, hash string) {
+	segmentConfigMutex.RLock()
+    defer segmentConfigMutex.RUnlock()
+	newConf := segmentsConfig[segmentName]
+	newConf.Polling.Hash = hash
+	segmentsConfig[segmentName] = newConf
 }

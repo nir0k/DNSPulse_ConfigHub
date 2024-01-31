@@ -26,7 +26,7 @@ Prometheus:
         recursion: true
 
 Resolvers:
-  path: config/test_srv_cs_srv.csv
+  path: configs/test_srv_cs_srv.csv
   delimeter: ','
   extraDelimeter: '&'
   pullTimeout: 3

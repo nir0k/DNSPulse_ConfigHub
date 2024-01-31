@@ -2,17 +2,12 @@
 {{ template "base.html" . }}
 
 {{ define "content" }}
-<div aria-live="polite" aria-atomic="true" class="position-relative">
-    <div class="toast-container position-absolute top-0 end-0 p-3" id="toastContainer">
-      <!-- Toasts will be dynamically added here -->
-    </div>
-</div>
 <div class="container mt-4">
     <h1>General Configuration</h1>
     <p>This page displays the main DataHub configuration</p>
     <div class="input-group mb-3">
         <p class="d-inline-flex gap-1" id="downloadUploadContainer">
-            <a href="/config/download" class="btn btn-info">Download Config</a>                 
+            <a href="/config/general/download" class="btn btn-info">Download Config</a>                 
             <form id="uploadForm" enctype="multipart/form-data" class="mb-3">
                 <div class="input-group">
                     <label class="input-group-text" for="configFile">Upload</label>
@@ -751,7 +746,7 @@
         var form = document.getElementById('uploadForm');
         var formData = new FormData(form);
     
-        fetch('/config/upload', {
+        fetch('/config/general/upload', {
             method: 'POST',
             body: formData,
         })

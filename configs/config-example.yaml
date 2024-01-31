@@ -22,7 +22,5 @@ WebServer:
   username: admin
   password: Password
 Configs:
-- name: PROD-SRV-CS
-  path: configs/prod_srv_cs.yaml
-- name: TEST-SRV-CS
-  path: configs/test_srv_cs.yaml
+- name: PROD
+  path: configs/segment-config-example.yaml

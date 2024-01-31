@@ -20,7 +20,7 @@
                     <div class="row mt-2 mb-3">
                         <div class="input-group mb-3">
                             <p class="d-inline-flex gap-1" id="downloadUploadContainer{{$name}}">
-                                <a href="/download-segment-config?segment={{$name}}" class="btn btn-info">Download Config</a>                    
+                                <a href="/config/segment/download?segment={{$name}}" class="btn btn-info">Download Config</a>                    
                                 <form action="/upload-config?segment={{$name}}" method="post" enctype="multipart/form-data" class="mb-3">
                                     <div class="input-group">
                                         <label class="input-group-text" for="inputGroupFile{{$name}}">Upload</label>
@@ -526,7 +526,7 @@
             },
         };
     
-        fetch('/update-segment-config', {
+        fetch('/config/segment/update', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -562,7 +562,7 @@
         var formData = new FormData();
         formData.append('configFile', file);
 
-        fetch('/upload-segment-config?segment=' + segmentName, {
+        fetch('/config/segment/upload?segment=' + segmentName, {
             method: 'POST',
             body: formData
         })
