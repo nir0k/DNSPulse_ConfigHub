@@ -123,11 +123,24 @@ func GetSegmentsConfig() *SegmentsMap {
     return &segmentsConfig
 }
 
+func GetSegmentsConfigBySEgment(segmentName string) SegmentConfStruct {
+    segmentConfigMutex.RLock()
+    defer segmentConfigMutex.RUnlock()
+    return segmentsConfig[segmentName]
+}
+
 func GetSegmentsPollingConfigbySegment(segmentName string) PollingConfigStruct{
     segmentConfigMutex.RLock()
     defer segmentConfigMutex.RUnlock()
 	conf := segmentsConfig[segmentName]
 	return conf.Polling
+}
+
+func GetSegmentsSyncConf(segmentName string) SegmentSyncConfigStruct{
+    segmentConfigMutex.RLock()
+    defer segmentConfigMutex.RUnlock()
+	conf := segmentsConfig[segmentName]
+	return conf.Sync
 }
 
 func UpdateSegmentConfig(newConf SegmentConfStruct) error {

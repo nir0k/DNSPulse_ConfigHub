@@ -4,7 +4,6 @@ import (
 	"ConfigHub/pkg/datastore"
 	"ConfigHub/pkg/logger"
 	"ConfigHub/pkg/tools"
-	// "fmt"
 
 	"ConfigHub/pkg/web"
 	"flag"
@@ -54,7 +53,5 @@ func main() {
 	setupAudit()
 	datastore.LoadSegmentConfigs()
 	datastore.LoadSegmentPollingHosts()
-	// r := datastore.GetPollingHosts()
-	// fmt.Printf("Data: %v\n", r)
 	web.Webserver()
 }

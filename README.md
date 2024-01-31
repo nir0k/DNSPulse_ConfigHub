@@ -5,5 +5,4 @@ Need to Add:
 - Reload config from file
 - gRPS
 - Audit
-- add list of servers
 - Docs
