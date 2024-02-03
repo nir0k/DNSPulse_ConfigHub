@@ -46,6 +46,12 @@ type WebServerConfigStruct struct {
 	Password 		string	`yaml:"password" json:"password"`
 }
 
+type GRPCServerConfigStruct struct {
+	Port 			int 	`yaml:"port" json:"port"`
+	Token 			string 	`yaml:"token" json:"token"`
+	EncryptionKey	string 	`yaml:"encryptionKey" json:"encryptionKey"`
+}
+
 type SegmentConfigsStruct struct {
 	Name	string	`yaml:"name"`
 	Path	string	`yaml:"path"`
@@ -57,6 +63,7 @@ type ConfigStruct struct {
 	Audit			LogAuditConfigStruct	`yaml:"Audit"`
 	WebServer		WebServerConfigStruct	`yaml:"WebServer"`
 	SegmentConfigs	[]SegmentConfigsStruct	`yaml:"Configs"`
+	GRPCServer		GRPCServerConfigStruct	`yaml:"gRPCServer"`
 }
 
 type HashStruct struct {

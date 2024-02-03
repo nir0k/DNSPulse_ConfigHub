@@ -2,11 +2,14 @@ package grpcserver
 
 import (
 	"context"
+	"fmt"
 	"net"
+	"strconv"
 
 	"ConfigHub/pkg/datastore"
 	pb "ConfigHub/pkg/gRPC"
 	"ConfigHub/pkg/logger"
+	"ConfigHub/pkg/tools"
 
 	"google.golang.org/grpc/codes"
 	_ "google.golang.org/grpc/encoding/gzip"
@@ -55,7 +58,16 @@ func convertToProtoSegmentConfig(segmentConfig datastore.SegmentConfStruct) *pb.
             RetriesCount: int32(segmentConfig.Prometheus.RetriesCount),
             BufferSize:  int32(segmentConfig.Prometheus.BufferSize),
             Labels: &pb.PrometheusLabelConfig{
-                // Set the fields for PrometheusLabelConfig
+                Opcode:             segmentConfig.Prometheus.Labels.Opcode,
+                Authoritative:      segmentConfig.Prometheus.Labels.Authoritative,
+                Truncated:          segmentConfig.Prometheus.Labels.Truncated,
+                Rcode:              segmentConfig.Prometheus.Labels.Rcode,
+                RecursionDesired:   segmentConfig.Prometheus.Labels.RecursionDesired,
+                RecursionAvailable: segmentConfig.Prometheus.Labels.RecursionAvailable,
+                AuthenticatedData:  segmentConfig.Prometheus.Labels.AuthenticatedData,
+                CheckingDisabled:   segmentConfig.Prometheus.Labels.CheckingDisabled,
+                PollingRate:        segmentConfig.Prometheus.Labels.PollingRate,
+                Recursion:          segmentConfig.Prometheus.Labels.Recursion,
             },
         },
         Polling: &pb.PollingConfig{
@@ -110,8 +122,16 @@ func convertToProtoCsv(csvData []datastore.Csv) (*pb.CsvList, error) {
     return protoCsvList, nil
 }
 
+func StartGRPCServer() {
+    port := datastore.GetConfig().GRPCServer.Port
+    if !tools.CheckPortAvailability(port) {
+		logger.Logger.Errorf("Port is already in use. Cannot start the gRPC server. Port: %d\n", port)
+        return
+    }
+    grpcServer(strconv.Itoa(port))
+}
 
-func GrpcServer(port string) {
+func grpcServer(port string) {
     lis, err := net.Listen("tcp", ":"+port)
     if err != nil {
 		logger.Logger.Fatalf("failed to listen: %v", err)
@@ -119,6 +139,8 @@ func GrpcServer(port string) {
 	grpcServer :=grpc.NewServer(
         grpc.UnaryInterceptor(authInterceptor),
     )
+    fmt.Printf("gRPC Server starting on port: %s\n", port)
+    logger.Logger.Infof("gRPC Server starting on port %s", port)
     pb.RegisterConfigHubServiceServer(grpcServer, &server{})
     if err := grpcServer.Serve(lis); err != nil {
         logger.Logger.Fatalf("failed to serve: %v", err)

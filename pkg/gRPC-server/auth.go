@@ -3,6 +3,7 @@ package grpcserver
 import (
 	"ConfigHub/pkg/datastore"
 	pb "ConfigHub/pkg/gRPC"
+	"ConfigHub/pkg/logger"
 	"context"
 	"reflect"
 
@@ -15,23 +16,27 @@ import (
 func authInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
     md, ok := metadata.FromIncomingContext(ctx)
     if !ok {
+        logger.Logger.Errorf("authInterceptor: metadata is not provided, err: %v", codes.Unauthenticated)
         return nil, status.Errorf(codes.Unauthenticated, "metadata is not provided")
     }
 
     // Assuming the token is passed in the "authorization" metadata
     tokens, ok := md["authorization"]
     if !ok || len(tokens) == 0 {
+        logger.Logger.Errorf("authInterceptor: authorization token is not provided, err: %v", codes.Unauthenticated)
         return nil, status.Errorf(codes.Unauthenticated, "authorization token is not provided")
     }
     token := tokens[0]
 
 	segmentName := extractSegmentName(req)
     if segmentName == "" {
+        logger.Logger.Errorf("authInterceptor: segment name is not provided, err: %v", codes.InvalidArgument)
         return nil, status.Errorf(codes.InvalidArgument, "segment name is not provided")
     }
 
     // Validate the token
     if !isValidToken(token, segmentName) {
+        logger.Logger.Errorf("authInterceptor: invalid token, err: %v", codes.Unauthenticated)
         return nil, status.Errorf(codes.Unauthenticated, "invalid token")
     }
     // Continue processing the request
@@ -39,11 +44,12 @@ func authInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServe
 }
 
 func isValidToken(clToken string, segmentName string) bool {
+    gRPCSrvToken := datastore.GetConfig().GRPCServer.Token
 	srvToken := datastore.GetSegmentsSyncConf(segmentName).Token
 	if srvToken == "" {
         return false
     }
-    return clToken == srvToken
+    return clToken == gRPCSrvToken
 }
 
 func extractSegmentName(req interface{}) string {

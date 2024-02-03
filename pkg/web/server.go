@@ -128,8 +128,8 @@ func startServer(done chan bool) {
         }
     }()
 
-    fmt.Println("Server starting on", serverAddr)
-    logger.Logger.Infof("Server starting on %s", serverAddr)
+    fmt.Printf("Web Server starting on %s\n", serverAddr)
+    logger.Logger.Infof("Web Server starting on %s", serverAddr)
     if conf.SSLEnabled {
         err = server.ListenAndServeTLS(conf.SSLCertPath, conf.SSLKeyPath)
     } else {

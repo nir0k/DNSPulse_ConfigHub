@@ -2,6 +2,7 @@ package main
 
 import (
 	"ConfigHub/pkg/datastore"
+	grpcserver "ConfigHub/pkg/gRPC-server"
 	"ConfigHub/pkg/logger"
 	"ConfigHub/pkg/tools"
 
@@ -53,5 +54,6 @@ func main() {
 	setupAudit()
 	datastore.LoadSegmentConfigs()
 	datastore.LoadSegmentPollingHosts()
+	go grpcserver.StartGRPCServer()
 	web.Webserver()
 }

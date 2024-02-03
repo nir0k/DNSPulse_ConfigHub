@@ -39,5 +39,5 @@ config.yaml
 /bin/*
 *.pem
 /log
-/configs/prod_srv_cs*
-/configs/test_srv_cs*
+configs/prod_srv_cs*
+configs/test_srv_cs*
