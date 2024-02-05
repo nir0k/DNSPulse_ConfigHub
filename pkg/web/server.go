@@ -1,10 +1,10 @@
 package web
 
 import (
-	"ConfigHub/pkg/datastore"
-	"ConfigHub/pkg/logger"
-	"ConfigHub/pkg/tools"
-	"ConfigHub/pkg/web/handlers"
+	"DNSPulse_ConfigHub/pkg/datastore"
+	"DNSPulse_ConfigHub/pkg/logger"
+	"DNSPulse_ConfigHub/pkg/tools"
+	"DNSPulse_ConfigHub/pkg/web/handlers"
 	"context"
 	"crypto/tls"
 	"embed"

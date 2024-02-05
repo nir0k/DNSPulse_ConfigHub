@@ -1,8 +1,8 @@
 package datastore
 
 import (
-	"ConfigHub/pkg/logger"
-	"ConfigHub/pkg/tools"
+	"DNSPulse_ConfigHub/pkg/logger"
+	"DNSPulse_ConfigHub/pkg/tools"
 	"fmt"
 	"os"
 	"sync"

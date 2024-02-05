@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"ConfigHub/pkg/datastore"
+	"DNSPulse_ConfigHub/pkg/datastore"
 	"encoding/json"
 	"fmt"
 	"html/template"

@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"ConfigHub/pkg/datastore"
-	"ConfigHub/pkg/logger"
-	"ConfigHub/pkg/tools"
+	"DNSPulse_ConfigHub/pkg/datastore"
+	"DNSPulse_ConfigHub/pkg/logger"
+	"DNSPulse_ConfigHub/pkg/tools"
 	"html/template"
 	"net/http"
 

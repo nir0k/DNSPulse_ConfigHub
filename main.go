@@ -1,12 +1,12 @@
 package main
 
 import (
-	"ConfigHub/pkg/datastore"
-	grpcserver "ConfigHub/pkg/gRPC-server"
-	"ConfigHub/pkg/logger"
-	"ConfigHub/pkg/tools"
+	"DNSPulse_ConfigHub/pkg/datastore"
+	grpcserver "DNSPulse_ConfigHub/pkg/gRPC-server"
+	"DNSPulse_ConfigHub/pkg/logger"
+	"DNSPulse_ConfigHub/pkg/tools"
 
-	"ConfigHub/pkg/web"
+	"DNSPulse_ConfigHub/pkg/web"
 	"flag"
 	"os"
 )

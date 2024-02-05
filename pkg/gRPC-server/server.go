@@ -6,10 +6,10 @@ import (
 	"net"
 	"strconv"
 
-	"ConfigHub/pkg/datastore"
-	pb "ConfigHub/pkg/gRPC"
-	"ConfigHub/pkg/logger"
-	"ConfigHub/pkg/tools"
+	"DNSPulse_ConfigHub/pkg/datastore"
+	pb "DNSPulse_ConfigHub/pkg/gRPC"
+	"DNSPulse_ConfigHub/pkg/logger"
+	"DNSPulse_ConfigHub/pkg/tools"
 
 	"google.golang.org/grpc/codes"
 	_ "google.golang.org/grpc/encoding/gzip"

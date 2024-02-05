@@ -1,9 +1,9 @@
 package grpcserver
 
 import (
-	"ConfigHub/pkg/datastore"
-	pb "ConfigHub/pkg/gRPC"
-	"ConfigHub/pkg/logger"
+	"DNSPulse_ConfigHub/pkg/datastore"
+	pb "DNSPulse_ConfigHub/pkg/gRPC"
+	"DNSPulse_ConfigHub/pkg/logger"
 	"context"
 	"reflect"
 

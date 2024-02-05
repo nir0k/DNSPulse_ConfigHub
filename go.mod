@@ -1,4 +1,4 @@
-module ConfigHub
+module DNSPulse_ConfigHub
 
 go 1.21.4
 
