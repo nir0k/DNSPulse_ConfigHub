@@ -20,7 +20,6 @@ func authInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServe
         return nil, status.Errorf(codes.Unauthenticated, "metadata is not provided")
     }
 
-    // Assuming the token is passed in the "authorization" metadata
     tokens, ok := md["authorization"]
     if !ok || len(tokens) == 0 {
         logger.Logger.Errorf("authInterceptor: authorization token is not provided, err: %v", codes.Unauthenticated)
@@ -34,12 +33,10 @@ func authInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServe
         return nil, status.Errorf(codes.InvalidArgument, "segment name is not provided")
     }
 
-    // Validate the token
     if !isValidToken(token, segmentName) {
         logger.Logger.Errorf("authInterceptor: invalid token, err: %v", codes.Unauthenticated)
         return nil, status.Errorf(codes.Unauthenticated, "invalid token")
     }
-    // Continue processing the request
     return handler(ctx, req)
 }
 
@@ -53,7 +50,6 @@ func isValidToken(clToken string, segmentName string) bool {
 }
 
 func extractSegmentName(req interface{}) string {
-    // Use reflection to determine the type of the request and extract segmentName
     val := reflect.ValueOf(req)
     if val.Kind() == reflect.Ptr && !val.IsNil() {
         val = val.Elem()

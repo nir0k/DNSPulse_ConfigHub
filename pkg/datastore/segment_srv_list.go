@@ -71,7 +71,7 @@ func readResolversFromCSV(segment SegmentConfigsStruct, conf PollingConfigStruct
         logger.Logger.Debug("CSV file has not been changed")
         return nil
     }
-    logger.Logger.Infof("CSV file has been changed")
+    logger.Logger.Info("CSV file has been changed")
 
 	resolversFromCsv := []Csv{}
     clientsFile, err := os.OpenFile(conf.Path, os.O_RDWR, os.ModePerm)
@@ -95,7 +95,6 @@ func readResolversFromCSV(segment SegmentConfigsStruct, conf PollingConfigStruct
     for _, record := range resolversFromCsv {
         key := record.Server + "-" + record.IPAddress + "-" + record.Domain
         if _, exists := uniqueChecker[key]; exists {
-            // Collect information about the duplicate
             duplicates = append(duplicates, key)
             continue
         }
@@ -103,7 +102,6 @@ func readResolversFromCSV(segment SegmentConfigsStruct, conf PollingConfigStruct
     }
 
     if len(duplicates) > 0 {
-        // Return an error with details of duplicates
         return fmt.Errorf("duplicates found in CSV file: %s", strings.Join(duplicates, ", "))
     }
     
@@ -148,14 +146,12 @@ func WriteResolversToCSV(segmentName string, conf PollingConfigStruct) error {
         return fmt.Errorf("no hosts found for segment %s", segmentName)
     }
 
-    // Open the file for writing
     clientsFile, err := os.OpenFile(conf.Path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.ModePerm)
     if err != nil {
         return fmt.Errorf("error opening file %s for writing: %v", conf.Path, err)
     }
     defer clientsFile.Close()
 
-    // Set the CSV writer settings, if required
     gocsv.SetCSVWriter(func(out io.Writer) *gocsv.SafeCSVWriter {
         writer := csv.NewWriter(out)
         if len(conf.Delimeter) > 0 {
@@ -164,12 +160,10 @@ func WriteResolversToCSV(segmentName string, conf PollingConfigStruct) error {
         return gocsv.NewSafeCSVWriter(writer)
     })
 
-    // Marshal and write the data
     if err := gocsv.MarshalFile(&hosts, clientsFile); err != nil {
         return fmt.Errorf("error marshalling data to file %s : %v", conf.Path, err)
     }
 
-    // Update the hash of the file after writing
     fileHash, err := tools.CalculateHash(string(conf.Path))
     if err != nil {
         logger.Logger.Errorf("Error Calculate hash to file '%s' err: %v\n", conf.Path, err)

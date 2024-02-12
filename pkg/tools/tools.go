@@ -34,13 +34,12 @@ func FormatUnixTime(unixTime int64) string {
         return "N/A"
     }
     t := time.Unix(unixTime, 0)
-    return t.Format("2006-01-02 15:04:05") // You can change this format as needed
+    return t.Format("2006-01-02 15:04:05")
 }
 
 func GetLocalIP() string {
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
-        // Write into log so wrong fetch IP
 		return ""
 	}
 	for _, addr := range addrs {
@@ -48,7 +47,6 @@ func GetLocalIP() string {
 			return ipnet.IP.String()
 		}
 	}
-    // Write into log so wrong fetch IP
 	return ""
 }
 

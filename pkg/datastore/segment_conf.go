@@ -65,10 +65,8 @@ type SegmentConfStruct struct {
 type SegmentsMap map[string]SegmentConfStruct
 
 var (
-	// segmentConfigFile		string
 	segmentsConfig			SegmentsMap
 	segmentConfigMutex 		sync.RWMutex
-	// segmentLastConfigHash 	HashStruct
 )
 
 func init() {
@@ -104,14 +102,10 @@ func loadSegmentConfig(s SegmentConfigsStruct) (bool, error) {
         return false, err
     }
 
-    // newConfig.Log = config.Log
-	// newConfig.General.Path = configFile
 	newConfig.General.Hash = newHash
 	segmentConfigMutex.Lock()
     segmentsConfig[s.Name] = newConfig
     segmentConfigMutex.Unlock()
-	// segmentLastConfigHash.LastHash = newHash
-    // segmentLastConfigHash.LastUpdate = time.Now().Unix()
 	logger.Logger.Debugf("Configurations for segment %s: %v\n", s.Name, segmentsConfig[s.Name])
 
     return true, nil
@@ -172,12 +166,10 @@ func SaveSegmentConfigToFile(segmentConfig SegmentConfStruct) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		// Write to a temporary file first
 		tempFile := filePath + ".tmp"
 		if err := os.WriteFile(tempFile, fileData, 0644); err != nil {
 			return "", err
 		}
-		// Rename temporary file to the actual config file
 		return filePath, os.Rename(tempFile, filePath)
 	}
 	return "", fmt.Errorf("failed to search segment '%s' config file path", segmentConfig.SegmentName)

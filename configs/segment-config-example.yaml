@@ -24,7 +24,7 @@ Prometheus:
     pollingRate: false
     recursion: true
 Resolvers:
-  path: config/segment-config-example.csv
+  path: configs/segment-config-example.csv
   delimeter: ','
   extraDelimeter: '&'
   pullTimeout: 1

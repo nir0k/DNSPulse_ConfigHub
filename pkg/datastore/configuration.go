@@ -114,7 +114,7 @@ func LoadConfig() (bool, error) {
         logger.Logger.Debug("Configuration file has not been changed")
         return false, nil
     }
-    logger.Logger.Infof("Configuration file has been changed")
+    logger.Logger.Info("Configuration file has been changed")
 
 	var newConfig ConfigStruct
     if err := yaml.Unmarshal(fileData, &newConfig); err != nil {
@@ -156,12 +156,10 @@ func SaveConfigToFile() error {
         return err
     }
 
-    // Write to a temporary file first
     tempFile := configFile + ".tmp"
     if err := os.WriteFile(tempFile, fileData, 0644); err != nil {
         return err
     }
 
-    // Rename temporary file to the actual config file
     return os.Rename(tempFile, configFile)
 }

@@ -21,11 +21,10 @@ func PollingSegmentHandler(tmpl *template.Template) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
         pollingConfigs := datastore.GetPollingHosts()
 
-        // Prepare data for template
         data := map[string]interface{}{
             "ShowNavBar": true,
             "Title":      "Polling Configurations",
-            "Segments":   *pollingConfigs, // Dereference the pointer
+            "Segments":   *pollingConfigs,
         }
 
         err := tmpl.ExecuteTemplate(w, "config-polling.html", data)
@@ -40,7 +39,6 @@ func FileHandler(w http.ResponseWriter, r *http.Request) {
     segmentName := r.URL.Query().Get("segment")
     switch r.Method {
     case "POST":
-        // Handle file upload
         if err := r.ParseMultipartForm(10 << 20); err != nil {
             http.Error(w, "Error parsing multipart form: "+err.Error(), http.StatusInternalServerError)
             return
@@ -74,7 +72,6 @@ func FileHandler(w http.ResponseWriter, r *http.Request) {
         fmt.Fprintf(w, "File uploaded successfully: %s", handler.Filename)
 
     case "GET":
-        // Handle file download
         filePath := datastore.GetSegmentsPollingConfigbySegment(segmentName).Path
         fileName := filepath.Base(filePath)
         if filePath == "" {
@@ -115,7 +112,6 @@ func UpdateSegmentDataHandler(w http.ResponseWriter, r *http.Request) {
     fmt.Printf("updateData: %v\n", updateData.Data)
 
     updatedData, err := datastore.UpdatePollingHostsBySegment(updateData.SegmentName, updateData.Data)
-    // updatedData := datastore.GetPollingHostsBySegment(updateData.SegmentName)
     if err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
@@ -126,7 +122,6 @@ func UpdateSegmentDataHandler(w http.ResponseWriter, r *http.Request) {
         "updatedData": updatedData,
     }
 
-    // Send a response back to the client
     w.Header().Set("Content-Type", "application/json")
     if err := json.NewEncoder(w).Encode(responseData); err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -38,10 +38,6 @@ func GenerateToken(username string) (string, error) {
 
 
 func ValidateToken(tokenString string) (*jwt.Token, error) {
-    // staticToken := datastore.GetConfig().Sync.Token
-    // if tokenString == staticToken {
-    //     return &jwt.Token{Valid: true}, nil
-    // }
 
     claims := &Claims{}
 
@@ -53,8 +49,6 @@ func ValidateToken(tokenString string) (*jwt.Token, error) {
 }
 
 func shouldRefreshToken(token *jwt.Token) bool {
-    // Define your logic to decide when to refresh the token
-    // For example, if the token expires in less than 5 minute
     const refreshInterval = 5 * time.Minute
     if claims, ok := token.Claims.(*Claims); ok && token.Valid {
         return time.Until(time.Unix(claims.ExpiresAt, 0)) < refreshInterval
@@ -96,7 +90,6 @@ func AuthMiddleware(handler http.HandlerFunc) http.HandlerFunc {
                     w.WriteHeader(http.StatusUnauthorized)
                     json.NewEncoder(w).Encode(map[string]string{"error": "Unauthorized: No valid token provided"})
                 } else {
-                // Handle missing token (e.g., redirect to login)
                     http.Redirect(w, r, "/login", http.StatusFound)
                 }
                 return
@@ -104,7 +97,6 @@ func AuthMiddleware(handler http.HandlerFunc) http.HandlerFunc {
             tokenString = cookie.Value
         }
 
-        // tokenString := cookie.Value
         token, err := ValidateToken(tokenString)
         if err != nil || !token.Valid {
             if isAPIEndpoint {
@@ -116,11 +108,8 @@ func AuthMiddleware(handler http.HandlerFunc) http.HandlerFunc {
             return
         }
 
-        // staticToken := datastore.GetConfig().Sync.Token
-        // if tokenString != staticToken && shouldRefreshToken(token) {
 		if shouldRefreshToken(token) {
 
-        // Optionally, refresh the token if it's close to expiration
             if shouldRefreshToken(token) {
                 newTokenString, err := GenerateToken(getUsernameFromToken(token))
                 if err != nil {
