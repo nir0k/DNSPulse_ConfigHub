@@ -42,6 +42,19 @@ func init() {
     pollingCSV = make(map[string][]Csv)
 }
 
+// API
+
+func GetPollingHostsBySegment(segmentName string) ([]Csv, bool) {
+    pollingHostsMutex.RLock()
+    defer pollingHostsMutex.RUnlock()
+    hosts, ok := pollingCSV[segmentName]
+    return hosts, ok
+}
+
+// API
+
+
+
 func LoadSegmentPollingHosts() error {
 	segments := GetConfig().SegmentConfigs
 	configs := *GetSegmentsConfig()
@@ -112,17 +125,9 @@ func readResolversFromCSV(segment SegmentConfigsStruct, conf PollingConfigStruct
     return nil
 }
 
-func GetPollingHostsBySegment(segmentName string) ([]Csv, bool) {
-    pollingHostsMutex.RLock()
-    defer pollingHostsMutex.RUnlock()
-    hosts, ok := pollingCSV[segmentName]
-    return hosts, ok
-}
-
 func GetPollingHosts() *pollingCSVMap {
     pollingHostsMutex.RLock()
     defer pollingHostsMutex.RUnlock()
-    fmt.Printf("pollingCSV: %v\n", pollingCSV)
     return &pollingCSV
 }
 

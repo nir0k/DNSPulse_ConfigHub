@@ -456,6 +456,8 @@
     </div>
 </div>
 <script>
+    var segments = {{ .SegmentConfigsJSON }};
+    
     function toggleSSLFields() {
         var sslEnabledCheckbox = document.getElementById('webServerConfigSSLEnabled');
         if (sslEnabledCheckbox) {
@@ -484,7 +486,24 @@
                 sslEnabledEditCheckbox.disabled = false;
                 sslEnabledEditCheckbox.checked = sslEnabledCheckbox.checked;
             }
+
+            if (section === 'segmentConfig') {
+                var editTableBody = document.getElementById('segmentConfigEditTableBody');
+                editTableBody.innerHTML = ''; // Clear existing rows
+    
+                segments.forEach(function(segment, index) {
+                    var row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td><input type="text" class="form-control" value="${segment.Name}" data-original-name="${segment.Name}"></td>
+                        <td><input type="text" class="form-control" value="${segment.Path}" data-original-path="${segment.Path}"></td>
+                        <td><button class="btn btn-danger" onclick="deleteSegmentRow(this)">Delete</button></td>
+                    `;
+                    editTableBody.appendChild(row);
+                });
+            }
         }
+        
     }
     
 
@@ -781,7 +800,11 @@
         var bsToast = new bootstrap.Toast(toast);
         bsToast.show();
     }
-    
-    
+      
+    function deleteSegmentRow(button) {
+        var row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        // Optionally, you might want to update the 'segments' array or handle the deletion differently based on your application's needs.
+    }
 </script>
 {{ end }}

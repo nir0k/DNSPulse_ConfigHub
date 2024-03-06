@@ -91,3 +91,11 @@ func CalculateHash(filePath string) (string, error) {
     
     return hex.EncodeToString(hash.Sum(nil)), nil
 }
+
+func GetHostName() string {
+    hostname, err := os.Hostname()
+    if err != nil {
+		hostname = "Current host"
+	}
+    return hostname
+}

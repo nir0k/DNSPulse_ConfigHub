@@ -10,7 +10,7 @@ GORUN=$(GOCMD) run
 BINARY_NAME=DNSPulse_ConfigHub
 
 build:
-	GOOS=linux GOARCH=amd64 CC=x86_64-linux-gnu-gcc $(GOBUILD) -o ./bin/$(BINARY_NAME)-linux-amd64 .
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 CC=x86_64-linux-gnu-gcc $(GOBUILD) -o ./bin/$(BINARY_NAME)-linux-amd64 .
 
 test:
 	@$(GOTEST) -v ./...

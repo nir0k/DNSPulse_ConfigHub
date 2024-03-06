@@ -57,6 +57,16 @@ type SegmentConfigsStruct struct {
 	Path	string	`yaml:"path"`
 }
 
+type APIConfigStruct struct {
+	Port			int	`yaml:"port"`
+	SSLEnabled 		bool	`yaml:"sslIsEnable" json:"sslIsEnable"`
+	SSLCertPath 	string	`yaml:"sslCertPath" json:"sslCertPath"`
+	SSLKeyPath 		string	`yaml:"sslKeyPath" json:"sslKeyPath"`
+	Username 		string	`yaml:"username" json:"username"`
+	Password 		string	`yaml:"password" json:"password"`
+	JWTKey 			string	`yaml:"JWTKey" json:"JWTKey"`
+}
+
 type ConfigStruct struct {
 	General			GeneralConfigStruct
 	Log				LogAppConfigStruct 
@@ -64,6 +74,7 @@ type ConfigStruct struct {
 	WebServer		WebServerConfigStruct	`yaml:"WebServer"`
 	SegmentConfigs	[]SegmentConfigsStruct	`yaml:"Configs"`
 	GRPCServer		GRPCServerConfigStruct	`yaml:"gRPCServer"`
+	Api 			APIConfigStruct			`yaml:"API"`
 }
 
 type HashStruct struct {
@@ -80,6 +91,61 @@ var (
 )
 
 
+// Sort for API
+
+func GetConfig() *ConfigStruct {
+    configMutex.RLock()
+    defer configMutex.RUnlock()
+    return &config
+}
+
+func GetJWTKey() []byte {
+    configMutex.RLock()
+    defer configMutex.RUnlock()
+    return []byte(config.Api.JWTKey)
+}
+
+func UpdateConfig(newConf ConfigStruct) error {
+	configMutex.RLock()
+    defer configMutex.RUnlock()
+	config = newConf
+	err := SaveConfigToFile()
+	return err
+}
+
+func SetLogConfig(logConfig LogAppConfigStruct){
+	configMutex.Lock()
+    config.Log = logConfig
+	logger.Logger.Debugf("Setup new Log configuration: %v", config.Log)
+    configMutex.Unlock()
+}
+
+func SetAuditConfig(auditConfig LogAuditConfigStruct){
+	configMutex.Lock()
+    config.Audit = auditConfig
+	logger.Logger.Debugf("Setup new Audit configuration: %v", config.Audit)
+    configMutex.Unlock()
+}
+
+func SetWebConfig(webConfig WebServerConfigStruct){
+	configMutex.Lock()
+    config.WebServer = webConfig
+	logger.Logger.Debugf("Setup new Web server configuration: %v", config.WebServer)
+    configMutex.Unlock()
+	SaveConfigToFile()
+}
+
+func SetApiConfig(apiConfig APIConfigStruct){
+	configMutex.Lock()
+    config.Api = apiConfig
+	logger.Logger.Debugf("Setup new Api configuration: %v", config.Api)
+    configMutex.Unlock()
+	SaveConfigToFile()
+}
+
+// Sort for API
+
+
 func SetConfigFilePath(path string){
 	configMutex.Lock()
     configFile = path
@@ -91,13 +157,6 @@ func GetConfigFilePath() string{
 	configMutex.RLock()
     defer configMutex.RUnlock()
     return configFile
-}
-
-func SetLogConfig(logconfig LogAppConfigStruct){
-	configMutex.Lock()
-    config.Log = logconfig
-	logger.Logger.Debugf("Setup new Log configuration: %v", config.Log)
-    configMutex.Unlock()
 }
 
 func LoadConfig() (bool, error) {
@@ -133,29 +192,14 @@ func LoadConfig() (bool, error) {
     return true, nil
 }
 
-func GetConfig() *ConfigStruct {
-    configMutex.RLock()
-    defer configMutex.RUnlock()
-    return &config
-}
-
-func UpdateConfig(newConf ConfigStruct) error {
-	configMutex.RLock()
-    defer configMutex.RUnlock()
-	config = newConf
-	err := SaveConfigToFile()
-	return err
-}
-
 func SaveConfigToFile() error {
     configMutex.RLock()
     defer configMutex.RUnlock()
-
+	
     fileData, err := yaml.Marshal(config)
     if err != nil {
         return err
     }
-
     tempFile := configFile + ".tmp"
     if err := os.WriteFile(tempFile, fileData, 0644); err != nil {
         return err

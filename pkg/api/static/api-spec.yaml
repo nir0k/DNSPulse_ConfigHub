@@ -1,0 +1,1515 @@
+openapi: 3.0.0
+info:
+  title: DNSPulse ConfigHUB API
+  version: 1.0.0
+  description: DNSPulse Configuration Management REST API
+servers:
+  - url: http://example.com/api
+    description: Production server
+paths:
+  /login:
+    post:
+      tags:
+        - Login
+      summary: Authenticate and retrieve a JWT token
+      description: Logs in using Basic Auth credentials to retrieve a JWT token for accessing protected endpoints.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Successfully authenticated and JWT token issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Authentication failed
+
+  /api/config/general/main:
+    get:
+      tags:
+        - Main Configuration
+      summary: Get Main Configuration
+      operationId: getMainConfig
+      responses:
+        '200':
+          description: Successful retrieval of the main configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralConfig'
+    patch:
+      tags:
+        - Main Configuration
+      summary: Update Main Configuration
+      operationId: updateMainConfig
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeneralConfig'
+      responses:
+        '200':
+          description: Main configuration updated successfully
+        '400':
+          description: Invalid request format
+    put:
+      tags:
+        - Main Configuration
+      summary: Replace Main Configuration
+      operationId: replaceMainConfig
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeneralConfig'
+      responses:
+        '200':
+          description: Main configuration replaced successfully
+        '400':
+          description: Invalid request format
+
+  /api/config/general/log:
+    get:
+      tags:
+        - Log Configuration
+      summary: Get log configuration
+      description: Retrieve the current logging configuration
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogConfig'
+    put:
+      tags:
+        - Log Configuration
+      summary: Update log configuration
+      description: Replace the current logging configuration with a new one
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogConfig'
+      responses:
+        '200':
+          description: Log configuration updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    patch:
+      tags:
+        - Log Configuration
+      summary: Modify log configuration
+      description: Apply partial modifications to the logging configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogConfigPatch'
+      responses:
+        '200':
+          description: Log configuration modified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  
+  /api/config/general/audit:
+    get:
+      tags:
+        - Audit Configuration
+      summary: Get audit configuration
+      description: Retrieve the current audit configuration
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditConfig'
+    put:
+      tags:
+        - Audit Configuration
+      summary: Update audit configuration
+      description: Replace the current audit configuration with a new one
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditConfig'
+      responses:
+        '200':
+          description: Audit configuration updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    patch:
+      tags:
+        - Audit Configuration
+      summary: Modify audit configuration
+      description: Apply partial modifications to the audit configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditConfigPatch'
+      responses:
+        '200':
+          description: Audit configuration modified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  
+  /api/config/general/web:
+    get:
+      tags:
+        - Web-Server Configuration
+      summary: Get web server configuration
+      description: Retrieve the current web server configuration
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebServerConfig'
+    put:
+      tags:
+        - Web-Server Configuration
+      summary: Update web server configuration
+      description: Replace the current web server configuration with a new one
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebServerConfig'
+      responses:
+        '200':
+          description: Web server configuration updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    patch:
+      tags:
+        - Web-Server Configuration
+      summary: Modify web server configuration
+      description: Apply partial modifications to the web server configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebServerConfigPatch'
+      responses:
+        '200':
+          description: Web server configuration modified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /api/config/general/segment:
+    get:
+      tags:
+        - Segment Configuration
+      summary: Get segment configurations
+      description: Retrieve a list of all segment configurations
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SegmentConfigsStruct'
+    post:
+      tags:
+        - Segment Configuration
+      summary: Create a new segment configuration
+      description: Add a new segment configuration to the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SegmentConfigsStruct'
+      responses:
+        '201':
+          description: Segment configuration created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentConfigsStruct'
+
+  /api/config/general/segment/{name}:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        description: Name of the segment
+        schema:
+          type: string
+    get:
+      tags:
+        - Segment Configuration
+      summary: Get a specific segment configuration
+      description: Retrieve the configuration for the specified segment
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentConfigsStruct'
+    post:
+      tags:
+        - Segment Configuration
+      summary: Create a new specific segment configuration
+      description: Add a new specific segment configuration to the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SegmentConfigsStruct'
+      responses:
+        '201':
+          description: Specific segment configuration created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentConfigsStruct'
+    put:
+      tags:
+        - Segment Configuration
+      summary: Replace a specific segment configuration
+      description: Replace the entire configuration for the specified segment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SegmentConfigsStruct'
+      responses:
+        '200':
+          description: Specific segment configuration replaced successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentConfigsStruct'
+    patch:
+      tags:
+        - Segment Configuration
+      summary: Modify a specific segment configuration
+      description: Apply partial modifications to the configuration of the specified segment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SegmentConfigsStruct'
+      responses:
+        '200':
+          description: Specific segment configuration modified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    delete:
+      tags:
+        - Segment Configuration
+      summary: Delete a specific segment configuration
+      description: Remove the configuration for the specified segment from the system
+      responses:
+        '200':
+          description: Specific segment configuration deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /api/config/general/file:
+    get:
+      tags:
+        - File Operations
+      summary: Download configuration file
+      description: Downloads the current general configuration file.
+      responses:
+        '200':
+          description: Configuration file successfully downloaded.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+    post:
+      tags:
+        - File Operations
+      summary: Upload new configuration file
+      description: Uploads a new configuration file, replacing the current one.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                configFile:
+                  type: string
+                  format: binary
+                  description: The new configuration file to upload.
+      responses:
+        '201':
+          description: Configuration file successfully uploaded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: File uploaded successfully
+
+  /api/config/segment/{name}/main:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        description: Name of the segment
+        schema:
+          type: string
+    get:
+      tags:
+        - Segment Main Configuration
+      summary: Get main segment configuration
+      description: Retrieve the main configuration for the specified segment.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentGeneralConfigStruct'
+    put:
+      tags:
+        - Segment Main Configuration
+      summary: Replace main segment configuration
+      description: Replace the entire main configuration for the specified segment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SegmentGeneralConfigStruct'
+      responses:
+        '200':
+          description: Main segment configuration replaced successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Configuration updated successfully
+    patch:
+      tags:
+        - Segment Main Configuration
+      summary: Modify main segment configuration
+      description: Apply partial modifications to the main configuration of the specified segment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SegmentGeneralConfigStruct'
+      responses:
+        '200':
+          description: Main segment configuration modified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Configuration updated successfully
+
+  /api/config/segment/{name}/sync:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        description: Name of the segment
+        schema:
+          type: string
+    get:
+      tags:
+        - Segment Sync Configuration
+      summary: Get segment synchronization configuration
+      description: Retrieve the synchronization configuration for the specified segment.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentSyncConfigStruct'
+    put:
+      tags:
+        - Segment Sync Configuration
+      summary: Replace segment synchronization configuration
+      description: Replace the entire synchronization configuration for the specified segment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SegmentSyncConfigStruct'
+      responses:
+        '200':
+          description: Segment synchronization configuration replaced successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Synchronization configuration updated successfully
+    patch:
+      tags:
+        - Segment Sync Configuration
+      summary: Modify segment synchronization configuration
+      description: Apply partial modifications to the synchronization configuration of the specified segment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SegmentSyncConfigStruct'
+      responses:
+        '200':
+          description: Segment synchronization configuration modified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Synchronization configuration updated successfully
+
+  /api/config/segment/{name}/polling:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        description: Name of the segment
+        schema:
+          type: string
+    get:
+      tags:
+        - Segment Polling Configuration
+      summary: Get segment polling configuration
+      description: Retrieve the polling configuration for the specified segment.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PollingConfigStruct'
+    put:
+      tags:
+        - Segment Polling Configuration
+      summary: Replace segment polling configuration
+      description: Replace the entire polling configuration for the specified segment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PollingConfigStruct'
+      responses:
+        '200':
+          description: Segment polling configuration replaced successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Polling configuration updated successfully
+    patch:
+      tags:
+        - Segment Polling Configuration
+      summary: Modify segment polling configuration
+      description: Apply partial modifications to the polling configuration of the specified segment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PollingConfigStruct'
+      responses:
+        '200':
+          description: Segment polling configuration modified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Polling configuration updated successfully
+
+  /api/config/segment/{name}/prometheus:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        description: Name of the segment
+        schema:
+          type: string
+    get:
+      tags:
+        - Segment Prometheus Configuration
+      summary: Get segment Prometheus configuration
+      description: Retrieve the Prometheus configuration for the specified segment.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrometheusConfStruct'
+    put:
+      tags:
+        - Segment Prometheus Configuration
+      summary: Replace segment Prometheus configuration
+      description: Replace the entire Prometheus configuration for the specified segment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrometheusConfStruct'
+      responses:
+        '200':
+          description: Segment Prometheus configuration replaced successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Prometheus configuration updated successfully
+    patch:
+      tags:
+        - Segment Prometheus Configuration
+      summary: Modify segment Prometheus configuration
+      description: Apply partial modifications to the Prometheus configuration of the specified segment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrometheusConfStruct'
+      responses:
+        '200':
+          description: Segment Prometheus configuration modified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Prometheus configuration updated successfully
+
+  /api/config/segment/{name}/prometheus/label:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        description: Name of the segment
+        schema:
+          type: string
+    get:
+      tags:
+        - Segment Prometheus Configuration
+      summary: Get Prometheus labels configuration for a segment
+      description: Retrieve the labels configuration within the Prometheus settings for the specified segment.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrometheusLabels'
+    put:
+      tags:
+        - Segment Prometheus Configuration
+      summary: Replace Prometheus labels configuration for a segment
+      description: Replace the entire labels configuration within the Prometheus settings for the specified segment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrometheusLabels'
+      responses:
+        '200':
+          description: Prometheus labels configuration replaced successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Labels configuration updated successfully
+    patch:
+      tags:
+        - Segment Prometheus Configuration
+      summary: Modify Prometheus labels configuration for a segment
+      description: Apply partial modifications to the labels configuration within the Prometheus settings of the specified segment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrometheusLabels'
+      responses:
+        '200':
+          description: Prometheus labels configuration modified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Labels configuration updated successfully
+
+  /api/config/segment/{name}/polling/servers:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        description: Name of the segment
+        schema:
+          type: string
+    get:
+      tags:
+        - Segment Polling Servers
+      summary: List polling servers with optional filtering and pagination
+      description: Retrieve a list of polling servers for the specified segment, with support for filtering by fields and pagination.
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+        - name: perPage
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            default: 10
+        - name: filter
+          in: query
+          description: Optional filter parameter to filter the servers list by specific fields
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response with a list of polling servers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Csv'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+    post:
+      tags:
+        - Segment Polling Servers
+      summary: Add a new polling server to the segment
+      description: Adds a new polling server configuration for the specified segment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Csv'
+      responses:
+        '201':
+          description: Polling server added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Server added successfully
+
+  /api/config/segment/{name}/polling/servers/{srvname}:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        description: Name of the segment
+        schema:
+          type: string
+      - name: srvname
+        in: path
+        required: true
+        description: Name or identifier of the server
+        schema:
+          type: string
+    get:
+      tags:
+        - Polling Server Configuration
+      summary: Get a specific polling server configuration
+      description: Retrieve the configuration for a specific polling server within the specified segment.
+      responses:
+        '200':
+          description: Successful response with the server's configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Csv'
+    patch:
+      tags:
+        - Polling Server Configuration
+      summary: Modify a specific polling server configuration
+      description: Apply partial modifications to the configuration of a specific polling server within the specified segment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Csv'
+      responses:
+        '200':
+          description: Specific polling server configuration modified successfully. Returns the updated server configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Csv'
+    put:
+      tags:
+        - Polling Server Configuration
+      summary: Replace a specific polling server configuration
+      description: Replace the entire configuration for a specific polling server within the specified segment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Csv'
+      responses:
+        '200':
+          description: Specific polling server configuration replaced successfully. Returns the new server configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Csv'
+    delete:
+      tags:
+        - Polling Server Configuration
+      summary: Delete a specific polling server configuration
+      description: Remove the configuration for a specific polling server from the specified segment.
+      responses:
+        '200':
+          description: Specific polling server configuration deleted successfully. The server configuration is no longer available.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Server configuration deleted successfully
+
+  /api/config/segment/{name}/file:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        description: The name of the segment for which the file is being managed
+        schema:
+          type: string
+    get:
+      tags:
+        - Segment File Configuration
+      summary: Download segment configuration file
+      description: Downloads the current configuration file for the specified segment.
+      responses:
+        '200':
+          description: Configuration file successfully downloaded.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+    post:
+      tags:
+        - Segment File Configuration
+      summary: Upload new segment configuration file
+      description: Uploads a new configuration file for the specified segment, potentially replacing the existing one.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The new configuration file to upload.
+      responses:
+        '201':
+          description: Configuration file successfully uploaded. Returns details of the upload.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: File uploaded successfully
+                  fileName:
+                    type: string
+                    example: segment-config.yaml
+                  fileSize:
+                    type: integer
+                    example: 1024
+                  contentType:
+                    type: string
+                    example: application/octet-stream
+
+  /api/config/segment/{name}/polling/servers/file:
+    parameters:
+      - name: name
+        in: path
+        required: true
+        description: The name of the segment for which the polling servers file is being managed
+        schema:
+          type: string
+    get:
+      tags:
+        - Polling Servers File Configuration
+      summary: Download polling servers configuration file
+      description: Downloads the current polling servers configuration file for the specified segment.
+      responses:
+        '200':
+          description: Polling servers configuration file successfully downloaded.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+                description: Binary content of the polling servers configuration file.
+    post:
+      tags:
+        - Polling Servers File Configuration
+      summary: Upload new polling servers configuration file
+      description: Uploads a new polling servers configuration file for the specified segment, potentially replacing the existing one.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The new polling servers configuration file to upload.
+      responses:
+        '204':
+          description: Polling servers configuration file successfully uploaded.
+
+  /api/config/general/api:
+    get:
+      tags:
+        - API Configuration
+      summary: Retrieve API Configuration
+      description: Fetches the current API configuration settings.
+      responses:
+        '200':
+          description: API configuration retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIConfigStruct'
+
+    patch:
+      tags:
+        - API Configuration
+      summary: Partially Update API Configuration
+      description: Updates part of the API configuration settings.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/APIConfigStruct'
+      responses:
+        '200':
+          description: API configuration updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIConfigStruct'
+
+    put:
+      tags:
+        - API Configuration
+      summary: Update API Configuration
+      description: Completely updates the API configuration settings.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/APIConfigStruct'
+      responses:
+        '200':
+          description: API configuration updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIConfigStruct'
+
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    GeneralConfig:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Path to the configuration file.
+      example:
+        path: "/config/general.yaml"
+
+    LogConfig:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Path to the log file
+        minSeverity:
+          type: string
+          description: Minimum severity of log messages
+        maxAge:
+          type: integer
+          description: Maximum age (in days) before a log file is rotated
+        maxSize:
+          type: integer
+          description: Maximum size (in MB) before a log file is rotated
+        maxFiles:
+          type: integer
+          description: Maximum number of log files to retain
+      example:
+        path: "logs/log.json"
+        minSeverity: "debug"
+        maxAge: 10
+        maxSize: 10
+        maxFiles: 10
+
+    LogConfigPatch:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Path to the log file (optional)
+        minSeverity:
+          type: string
+          description: Minimum severity of log messages (optional)
+        maxAge:
+          type: integer
+          description: Maximum age (in days) before a log file is rotated (optional)
+        maxSize:
+          type: integer
+          description: Maximum size (in MB) before a log file is rotated (optional)
+        maxFiles:
+          type: integer
+          description: Maximum number of log files to retain (optional)
+      example:
+        minSeverity: "info"
+        maxAge: 15
+    
+    AuditConfig:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Path to the audit log file
+        minSeverity:
+          type: string
+          description: Minimum severity of audit messages
+        maxAge:
+          type: integer
+          description: Maximum age (in days) before an audit log file is rotated
+        maxSize:
+          type: integer
+          description: Maximum size (in MB) before an audit log file is rotated
+        maxFiles:
+          type: integer
+          description: Maximum number of audit log files to retain
+      example:
+        path: "audit/audit.json"
+        minSeverity: "warning"
+        maxAge: 30
+        maxSize: 100
+        maxFiles: 5
+    
+    AuditConfigPatch:
+      type: object
+      properties:
+        path:
+          type: string
+          description: Path to the audit log file (optional)
+        minSeverity:
+          type: string
+          description: Minimum severity of audit messages (optional)
+        maxAge:
+          type: integer
+          description: Maximum age (in days) before an audit log file is rotated (optional)
+        maxSize:
+          type: integer
+          description: Maximum size (in MB) before an audit log file is rotated (optional)
+        maxFiles:
+          type: integer
+          description: Maximum number of audit log files to retain (optional)
+      example:
+        minSeverity: "info"
+        maxAge: 60
+    
+    WebServerConfig:
+      type: object
+      properties:
+        Port:
+          type: integer
+          description: The port number on which the web server listens
+        ListenAddress:
+          type: string
+          description: The IP address or hostname where the web server listens
+        SSLEnabled:
+          type: boolean
+          description: Whether SSL is enabled for the web server
+        SSLCertPath:
+          type: string
+          description: Path to the SSL certificate file
+        SSLKeyPath:
+          type: string
+          description: Path to the SSL key file
+        SessionTimeout:
+          type: integer
+          description: Session timeout in minutes
+        Username:
+          type: string
+          description: Username for web server authentication
+        Password:
+          type: string
+          description: Password for web server authentication
+      example:
+        Port: 8080
+        ListenAddress: "0.0.0.0"
+        SSLEnabled: true
+        SSLCertPath: "/path/to/cert.pem"
+        SSLKeyPath: "/path/to/key.pem"
+        SessionTimeout: 30
+        Username: "admin"
+        Password: "secret"
+    
+    WebServerConfigPatch:
+      type: object
+      properties:
+        Port:
+          type: integer
+          description: The port number on which the web server listens (optional)
+        ListenAddress:
+          type: string
+          description: The IP address or hostname where the web server listens (optional)
+        SSLEnabled:
+          type: boolean
+          description: Whether SSL is enabled for the web server (optional)
+        SSLCertPath:
+          type: string
+          description: Path to the SSL certificate file (optional)
+        SSLKeyPath:
+          type: string
+          description: Path to the SSL key file (optional)
+        SessionTimeout:
+          type: integer
+          description: Session timeout in minutes (optional)
+        Username:
+          type: string
+          description: Username for web server authentication (optional)
+        Password:
+          type: string
+          description: Password for web server authentication (optional)
+      example:
+        SSLEnabled: false
+        SessionTimeout: 45
+
+    SegmentConfigsStruct:
+      type: object
+      properties:
+        Name:
+          type: string
+          description: Name of the segment
+        Path:
+          type: string
+          description: Filesystem path associated with the segment configuration
+      required:
+        - Name
+        - Path
+      example:
+        Name: "PrimaryDataCenter"
+        Path: "/config/segments/primary.yaml"
+
+    SegmentGeneralConfigStruct:
+      type: object
+      properties:
+        CheckInterval:
+          type: integer
+          description: Interval in seconds for checking the segment configuration
+      required:
+        - CheckInterval
+      example:
+        CheckInterval: 60
+
+    SegmentSyncConfigStruct:
+      type: object
+      properties:
+        IsEnable:
+          type: boolean
+          description: Indicates if synchronization is enabled for this segment
+        Token:
+          type: string
+          description: Token used for authentication in synchronization process
+      required:
+        - IsEnable
+        - Token
+      example:
+        IsEnable: true
+        Token: "your_token_here"
+
+    PollingConfigStruct:
+      type: object
+      properties:
+        Path:
+          type: string
+          description: Filesystem path to the polling configuration file
+        Delimeter:
+          type: string
+          description: Delimiter used in the polling configuration file
+        ExtraDelimeter:
+          type: string
+          description: Additional delimiter used for further parsing requirements
+        PollTimeout:
+          type: integer
+          description: Timeout in seconds for polling operations
+      required:
+        - Path
+        - Delimeter
+        - PollTimeout
+      example:
+        Path: "/config/segments/segment1/polling.csv"
+        Delimeter: ","
+        ExtraDelimeter: ";"
+        PollTimeout: 30
+
+    PrometheusConfStruct:
+      type: object
+      properties:
+        URL:
+          type: string
+          description: The URL for the Prometheus server
+        AuthEnabled:
+          type: boolean
+          description: Indicates if authentication is enabled for connecting to Prometheus
+        Username:
+          type: string
+          description: Username for Prometheus authentication, required if AuthEnabled is true
+        Password:
+          type: string
+          description: Password for Prometheus authentication, required if AuthEnabled is true
+        MetricName:
+          type: string
+          description: Name of the metric to be collected
+        RetriesCount:
+          type: integer
+          description: Number of retries for Prometheus queries
+        BufferSize:
+          type: integer
+          description: Size of the buffer for storing metrics before flushing
+        Labels:
+          type: object
+          properties:
+            Opcode:
+              type: boolean
+            Authoritative:
+              type: boolean
+            Truncated:
+              type: boolean
+            Rcode:
+              type: boolean
+            RecursionDesired:
+              type: boolean
+            RecursionAvailable:
+              type: boolean
+            AuthenticatedData:
+              type: boolean
+            CheckingDisabled:
+              type: boolean
+            PollingRate:
+              type: boolean
+            Recursion:
+              type: boolean
+          description: Configuration for the labels to be included in the Prometheus metrics
+      required:
+        - URL
+        - MetricName
+      example:
+        URL: "http://prometheus.example.com/"
+        AuthEnabled: true
+        Username: "user"
+        Password: "pass"
+        MetricName: "dns_resolve"
+        RetriesCount: 3
+        BufferSize: 10000
+        Labels:
+          Opcode: true
+          Authoritative: false
+          Truncated: false
+          Rcode: true
+          RecursionDesired: true
+          RecursionAvailable: true
+          AuthenticatedData: false
+          CheckingDisabled: false
+          PollingRate: true
+          Recursion: true
+
+    PrometheusLabels:
+      type: object
+      properties:
+        Opcode:
+          type: boolean
+          description: Include the opcode label in the Prometheus metrics
+        Authoritative:
+          type: boolean
+          description: Include the authoritative label in the Prometheus metrics
+        Truncated:
+          type: boolean
+          description: Include the truncated label in the Prometheus metrics
+        Rcode:
+          type: boolean
+          description: Include the rcode label in the Prometheus metrics
+        RecursionDesired:
+          type: boolean
+          description: Include the recursionDesired label in the Prometheus metrics
+        RecursionAvailable:
+          type: boolean
+          description: Include the recursionAvailable label in the Prometheus metrics
+        AuthenticatedData:
+          type: boolean
+          description: Include the authenticatedData label in the Prometheus metrics
+        CheckingDisabled:
+          type: boolean
+          description: Include the checkingDisabled label in the Prometheus metrics
+        PollingRate:
+          type: boolean
+          description: Include the pollingRate label in the Prometheus metrics
+        Recursion:
+          type: boolean
+          description: Include the recursion label in the Prometheus metrics
+      example:
+        Opcode: true
+        Authoritative: true
+        Truncated: false
+        Rcode: true
+        RecursionDesired: true
+        RecursionAvailable: true
+        AuthenticatedData: false
+        CheckingDisabled: false
+        PollingRate: true
+        Recursion: false
+
+    Csv:
+      type: object
+      properties:
+        Server:
+          type: string
+          description: Name or identifier of the server
+        IPAddress:
+          type: string
+          description: IP address of the server
+        Domain:
+          type: string
+          description: Domain name associated with the server
+        Location:
+          type: string
+          description: Physical or virtual location of the server
+        Site:
+          type: string
+          description: Site name where the server is located
+        ServerSecurityZone:
+          type: string
+          description: Security zone classification for the server
+        Prefix:
+          type: string
+        Protocol:
+          type: string
+        Zonename:
+          type: string
+        QueryCount:
+          type: string
+        ZonenameWithRecursion:
+          type: string
+        QueryCountWithRecursion:
+          type: string
+        ServiceMode:
+          type: string
+      example:
+        Server: "Server1"
+        IPAddress: "192.168.1.1"
+        Domain: "example.com"
+        Location: "Data Center 1"
+        Site: "Site A"
+        ServerSecurityZone: "Internal"
+        Prefix: "dnsmon"
+        Protocol: "UDP"
+        Zonename: "example-zone"
+        QueryCount: "100"
+        ZonenameWithRecursion: "example-zone-rec"
+        QueryCountWithRecursion: "150"
+        ServiceMode: "Active"
+    
+    Pagination:
+      type: object
+      properties:
+        totalRecords:
+          type: integer
+          example: 100
+        currentPage:
+          type: integer
+          example: 1
+        totalPages:
+          type: integer
+          example: 10
+        nextPage:
+          type: integer
+          example: 2
+        prevPage:
+          type: integer
+          example: null
+
+    APIConfigStruct:
+      type: object
+      properties:
+        Port:
+          type: integer
+          description: The port on which the API is running.
+        SSLEnabled:
+          type: boolean
+          description: Indicates if SSL is enabled.
+        SSLCertPath:
+          type: string
+          description: Path to the SSL certificate file.
+        SSLKeyPath:
+          type: string
+          description: Path to the SSL key file.
+        Username:
+          type: string
+          description: The username for API authentication.
+        Password:
+          type: string
+          format: password
+          description: The password for API authentication.
+        JWTKey:
+          type: string
+          description: Secret key used for signing JWT tokens.
+
+security:
+  - BearerAuth: []
+
+
+
+
+
+

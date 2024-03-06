@@ -3,7 +3,7 @@ general:
 log:
   path: logs/log.json
   minseverity: debug
-  maxage: 10
+  maxage: 99
   maxsize: 10
   maxfiles: 10
 Audit:
@@ -13,14 +13,20 @@ Audit:
   maxSize: 10
   maxFiles: 11
 WebServer:
-  port: 443
+  port: 8443
   listenAddress: 0.0.0.0
-  sslIsEnable: false
+  sslIsEnable: true
   sslCertPath: configs/ssl/cert.pem
   sslKeyPath: configs/ssl/key.pem
-  sesionTimeout: 999
+  sesionTimeout: 9997
   username: admin
   password: Password
 Configs:
-- name: PROD
-  path: configs/segment-config-example.yaml
+- name: PROD-SRV-CS
+  path: configs/prod_srv_cs.yaml
+- name: TEST-SRV-CS
+  path: configs/test_srv_cs.yaml
+gRPCServer:
+  port: 50051
+  token: Gbs6pVdzxK3ADGAYOdPE4mxbO13miRo6Ks0WsymuEMKYscbsVU7cA5IwOzzsL39Y
+  encryptionKey: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

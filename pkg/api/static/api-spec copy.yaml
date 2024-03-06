@@ -1,0 +1,221 @@
+openapi: 3.0.0
+info:
+  title: DNSPulse ConfigHUB restAPI
+  version: 1.0.0
+  description: rest API
+servers:
+  - url: SERVER_URL_PLACEHOLDER
+    description: Production server
+
+paths:
+  /api/configs/general/:
+  /api/configs/general/main:
+    get:
+      summary: Получение основной конфигурации
+      # description:
+      # parameters:
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ServerID:
+                      type: string
+                    Port:
+                      type: string
+                    WWN:
+                      type: string
+                    Alias:
+                      type: string
+              example: 
+                - Alias: "Alias1_Port1_Example1"
+                  Port: "Port1_Example1"
+                  ServerID: "Example1"
+                  WWN: "WWN1_Port1_Example1"
+                - Alias: "Alias2_Port1_Example1"
+                  Port: "Port1_Example1"
+                  ServerID: "Example1"
+                  WWN: "WWN2_Port1_Example1"
+                
+  /api/configs/general/log:
+    get:
+      summary:
+      description:
+      parameters:
+      responses:
+  /api/configs/general/audit:
+    get:
+      summary:
+      description:
+      parameters:
+      responses:
+  /api/configs/general/web:
+    get:
+      summary:
+      description:
+      parameters:
+      responses:
+  /api/configs/general/segment:
+    get:
+      summary:
+      description:
+      parameters:
+      responses:
+  /api/configs/segment/:
+  /api/configs/segment/<segment>:
+  /api/configs/segment/<segment>/main:
+  /api/configs/segment/<segment>/sync:
+  /api/configs/segment/<segment>/polling:
+  /api/configs/segment/<segment>/prometheus:
+  /api/configs/segment/<segment>/prometheus/labels:
+  /api/configs/polling/<segment>/<id>:
+    get:
+      summary: Fetches filtered data for Grafana
+      description: >
+        Use <code>/query</code> to get all data.<br>
+        Use <code>/query?serverID=Example1</code> to get data filtered by <code>serverID</code>.<br>
+        Use <code>/query?port=Port1_Example1</code> to get data filtered by <code>port</code>.<br>
+        Use <code>/query?serverID=Example1&port=Port1_Example1</code> to get data filtered by both <code>serverID</code> and <code>port</code>.<br>
+      parameters:
+        - name: serverID
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: port
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ServerID:
+                      type: string
+                    Port:
+                      type: string
+                    WWN:
+                      type: string
+                    Alias:
+                      type: string
+              example: 
+                - Alias: "Alias1_Port1_Example1"
+                  Port: "Port1_Example1"
+                  ServerID: "Example1"
+                  WWN: "WWN1_Port1_Example1"
+                - Alias: "Alias2_Port1_Example1"
+                  Port: "Port1_Example1"
+                  ServerID: "Example1"
+                  WWN: "WWN2_Port1_Example1"
+
+
+  /list:
+    get:
+      summary: Lists server IDs or ports
+      description: >
+        Use <code>/list?type=serverID</code> to get a list of server IDs.<br>
+        Use <code>/list?type=port&serverID=Example1</code> to get a list of ports for <code>serverID=Example1</code>.<br>
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [serverID, port]
+        - name: serverID
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                serverIDs:
+                  summary: Example response for serverID list
+                  value: ["Example3", "Example1", "Example2"]
+                  description: Example obtained using `/list?type=serverID`
+                portsForServerID:
+                  summary: Example response for port list filtered by serverID
+                  value: ["Port1_Example1", "Port2_Example1"]
+                  description: Example obtained using `/list?type=port&serverID=Example1`
+
+  /data:
+    get:
+      summary: Fetches all port data
+      description: Showed RAW data
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PortNeighborsAlias'
+              example: 
+                Example1:
+                  - port: "Port1_Example1"
+                    members:
+                      - wwn: "WWN1_Port1_Example1"
+                        alias: "Alias1_Port1_Example1"
+                      - wwn: "WWN2_Port1_Example1"
+                        alias: "Alias2_Port1_Example1"
+                  - port: "Port2_Example1"
+                    members:
+                      - wwn: "WWN1_Port2_Example1"
+                        alias: "Alias1_Port2_Example1"
+                      - wwn: "WWN2_Port2_Example1"
+                        alias: "Alias2_Port2_Example1"
+                Example2:
+                  - port: "Port1_Example2"
+                    members:
+                      - wwn: "WWN1_Port1_Example2"
+                        alias: "Alias1_Port1_Example2"
+                      - wwn: "WWN2_Port1_Example2"
+                        alias: "Alias2_Port1_Example2"
+                Example3:
+                  - port: "Port1_Example3"
+                    members:
+                      - wwn: "WWN1_Port1_Example3"
+                        alias: "Alias1_Port1_Example3"
+
+components:
+  schemas:
+    PortNeighborsAlias:
+      type: object
+      properties:
+        Port:
+          type: string
+        Members:
+          type: array
+          items:
+            $ref: '#/components/schemas/Member'
+
+    Member:
+      type: object
+      properties:
+        WWN:
+          type: string
+        Alias:
+          type: string

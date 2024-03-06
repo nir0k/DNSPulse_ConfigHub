@@ -1,6 +1,7 @@
 package main
 
 import (
+	"DNSPulse_ConfigHub/pkg/api"
 	"DNSPulse_ConfigHub/pkg/datastore"
 	grpcserver "DNSPulse_ConfigHub/pkg/gRPC-server"
 	"DNSPulse_ConfigHub/pkg/logger"
@@ -55,5 +56,6 @@ func main() {
 	datastore.LoadSegmentConfigs()
 	datastore.LoadSegmentPollingHosts()
 	go grpcserver.StartGRPCServer()
+	go api.Apisrv()
 	web.Webserver()
 }

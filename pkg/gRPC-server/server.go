@@ -36,6 +36,7 @@ func (s *server) GetSegmentConfig(ctx context.Context, req *pb.GetSegmentConfigR
 }
 
 func convertToProtoSegmentConfig(segmentConfig datastore.SegmentConfStruct) *pb.SegmentConfStruct {
+
     return &pb.SegmentConfStruct{
         SegmentName: segmentConfig.SegmentName,
         General: &pb.GeneralConfig{

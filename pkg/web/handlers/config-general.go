@@ -9,10 +9,33 @@ import (
 	"os"
 )
 
+func toJSON(v interface{}) template.JS {
+    b, err := json.Marshal(v)
+    if err != nil {
+        // Handle error (e.g., by logging or defaulting to a safe value)
+        return template.JS("{}")
+    }
+    return template.JS(b)
+}
+
+func createTemplateFuncMap() template.FuncMap {
+    return template.FuncMap{
+        "toJSON": toJSON,
+    }
+}
+
 func ConfigGeneralHandler(tmpl *template.Template) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
 
         configData := datastore.GetConfig()
+
+        funcMap := createTemplateFuncMap()
+        tmpl = tmpl.Funcs(funcMap)
+
+        // templateData := map[string]interface{}{
+        //     "ShowNavBar": true,      // This is existing data you were passing
+        //     "Config":     configData, // Pass the entire configuration structure
+        // }
 
         templateData := map[string]interface{}{
             "ShowNavBar": true,

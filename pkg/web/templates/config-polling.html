@@ -15,18 +15,15 @@
                     </h2>
                     <div id="collapse{{ $segmentName }}" class="accordion-collapse collapse" aria-labelledby="heading{{ $segmentName }}" data-bs-parent="#accordionPollingConfig">
                         <div class="accordion-body">
-                            <!-- Button Group for Upload and Download -->
                             <div class="btn-group" role="group" aria-label="File Operations">
-                                <!-- File Upload Control -->
                                 <form action="/config/polling/file?segment={{ $segmentName }}" method="post" enctype="multipart/form-data">
                                     <div class="input-group">
                                         <input type="file" class="form-control" name="file" id="inputGroupFile{{ $segmentName }}">
-                                        <input type="hidden" name="segment" value="{{ $segmentName }}"> <!-- Hidden field to send segment name -->
+                                        <input type="hidden" name="segment" value="{{ $segmentName }}">
                                         <button class="btn btn-outline-secondary" type="submit" id="buttonUpload{{ $segmentName }}" data-segment="{{ $segmentName }}">Upload</button>
 
                                     </div>
                                 </form>
-                                <!-- Download Button -->
                                 <a href="/config/polling/file?segment={{ $segmentName }}" class="btn btn-outline-primary" role="button">Download</a>
                             </div>
                             <div class="edit-buttons">
@@ -34,10 +31,9 @@
                                 <button class="btn btn-success save-button" data-segment="{{ $segmentName }}" style="display:none;">Save</button>
                                 <button class="btn btn-danger cancel-button" data-segment="{{ $segmentName }}" style="display:none;">Cancel</button>
                             </div>
-                            <!-- Table of Hosts -->
-                            <div class="table-responsive">
+                            <div class="table-responsive scrollable-table">
                                 <table class="table table-striped mt-3 w-100">
-                                    <thead>
+                                    <thead class="sticky-top">
                                         <tr>
                                             <th>Hostname</th>
                                             <th>IP Address</th>
@@ -52,85 +48,60 @@
                                             <th>ZonenameWithRecursion</th>
                                             <th>QueryCountWithRecursion</th>
                                             <th>ServiceMode</th>
-                                            <!-- Add more columns as needed -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {{ range $hosts }}
                                             <tr>
-                                                <!-- Server Field -->
                                                 <td>
                                                     <span class="display-mode Server">{{ .Server }}</span>
                                                     <input type="text" class="edit-mode form-control" value="{{ .Server }}" name="Server" style="display:none;">
                                                 </td>
-
-                                                <!-- IP Address Field -->
                                                 <td>
                                                     <span class="display-mode IPAddress">{{ .IPAddress }}</span>
                                                     <input type="text" class="edit-mode form-control" value="{{ .IPAddress }}" name="IPAddress" style="display:none;">
                                                 </td>
-
-                                                <!-- Domain Field -->
                                                 <td>
                                                     <span class="display-mode Domain">{{ .Domain }}</span>
                                                     <input type="text" class="edit-mode form-control" value="{{ .Domain }}" name="Domain" style="display:none;">
                                                 </td>
-
-                                                <!-- Location Field -->
                                                 <td>
                                                     <span class="display-mode Location">{{ .Location }}</span>
                                                     <input type="text" class="edit-mode form-control" value="{{ .Location }}" name="Location" style="display:none;">
                                                 </td>
-
-                                                <!-- Site Field -->
                                                 <td>
                                                     <span class="display-mode Site">{{ .Site }}</span>
                                                     <input type="text" class="edit-mode form-control" value="{{ .Site }}" name="Site" style="display:none;">
                                                 </td>
-
-                                                <!-- ServerSecurityZone Field -->
                                                 <td>
                                                     <span class="display-mode ServerSecurityZone">{{ .ServerSecurityZone }}</span>
                                                     <input type="text" class="edit-mode form-control" value="{{ .ServerSecurityZone }}" name="ServerSecurityZone" style="display:none;">
                                                 </td>
-
-                                                <!-- Prefix Field -->
                                                 <td>
                                                     <span class="display-mode Prefix">{{ .Prefix }}</span>
                                                     <input type="text" class="edit-mode form-control" value="{{ .Prefix }}" name="Prefix" style="display:none;">
                                                 </td>
 
-                                                <!-- Protocol Field -->
                                                 <td>
                                                     <span class="display-mode Protocol">{{ .Protocol }}</span>
                                                     <input type="text" class="edit-mode form-control" value="{{ .Protocol }}" name="Protocol" style="display:none;">
                                                 </td>
-
-                                                <!-- Zonename Field -->
                                                 <td>
                                                     <span class="display-mode Zonename">{{ .Zonename }}</span>
                                                     <input type="text" class="edit-mode form-control" value="{{ .Zonename }}" name="Zonename" style="display:none;">
                                                 </td>
-
-                                                <!-- QueryCount Field -->
                                                 <td>
                                                     <span class="display-mode QueryCount">{{ .QueryCount }}</span>
                                                     <input type="text" class="edit-mode form-control" value="{{ .QueryCount }}" name="QueryCount" style="display:none;">
                                                 </td>
-
-                                                <!-- ZonenameWithRecursion Field -->
                                                 <td>
                                                     <span class="display-mode ZonenameWithRecursion">{{ .ZonenameWithRecursion }}</span>
                                                     <input type="text" class="edit-mode form-control" value="{{ .ZonenameWithRecursion }}" name="ZonenameWithRecursion" style="display:none;">
                                                 </td>
-
-                                                <!-- QueryCountWithRecursion Field -->
                                                 <td>
                                                     <span class="display-mode QueryCountWithRecursion">{{ .QueryCountWithRecursion }}</span>
                                                     <input type="text" class="edit-mode form-control" value="{{ .QueryCountWithRecursion }}" name="QueryCountWithRecursion" style="display:none;">
                                                 </td>
-
-                                                <!-- ServiceMode Field -->
                                                 <td>
                                                     <span class="display-mode ServiceMode">{{ .ServiceMode }}</span>
                                                     <input type="text" class="edit-mode form-control" value="{{ .ServiceMode }}" name="ServiceMode" style="display:none;">
@@ -195,10 +166,11 @@
         var toastEl = document.getElementById(toastId);
         var bsToast = new bootstrap.Toast(toastEl);
         bsToast.show();
-        setTimeout(function() { bsToast.dispose(); }, 5000); // Auto-dismiss after 5 seconds
+        setTimeout(function() { bsToast.dispose(); }, 5000);
     }
+
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle edit button click
+
         document.querySelectorAll('.edit-button').forEach(function(button) {
             button.addEventListener('click', function() {
                 var segmentName = this.dataset.segment;
@@ -206,7 +178,6 @@
             });
         });
 
-        // Handle save button click
         document.querySelectorAll('.save-button').forEach(function(button) {
             button.addEventListener('click', function() {
                 var segmentName = this.dataset.segment;
@@ -214,7 +185,6 @@
             });
         });
 
-        // Handle cancel button click
         document.querySelectorAll('.cancel-button').forEach(function(button) {
             button.addEventListener('click', function() {
                 var segmentName = this.dataset.segment;
@@ -222,7 +192,7 @@
             });
         });
     });
-
+    
     function saveChanges(segmentName) {
         var updatedData = [];
         var rows = document.querySelectorAll('#collapse' + segmentName + ' tr');
@@ -241,7 +211,6 @@
             }
         });
     
-        // Send updatedData to the server
         fetch('/config/polling/update', {
             method: 'POST',
             headers: {
@@ -276,60 +245,64 @@
                     }
                     var editInput = row.querySelector('.edit-mode[name="' + key + '"]');
                     if (editInput) {
-                        editInput.value = value; // Update the input value as well
+                        editInput.value = value;
                     }
                 });
             }
         });
     }
     
-    
-
     function exitEditMode(segmentName) {
-        var rows = document.querySelectorAll('#collapse' + segmentName + ' tr');
-        rows.forEach(function(row) {
-            row.querySelectorAll('.edit-mode').forEach(function(input) {
-                input.style.display = 'none';
-            });
-            row.querySelectorAll('.display-mode').forEach(function(span) { 
-                span.style.display = ''; 
-            });
-        });
+        const segmentContainer = document.querySelector('#collapse' + segmentName);
+        if (segmentContainer) {
+            segmentContainer.classList.remove('editing');
     
-        // Hide save and cancel buttons, show edit button
-        document.querySelector('.save-button[data-segment="' + segmentName + '"]').style.display = 'none';
-        document.querySelector('.cancel-button[data-segment="' + segmentName + '"]').style.display = 'none';
-        document.querySelector('.edit-button[data-segment="' + segmentName + '"]').style.display = 'inline-block';
+            const editModeElements = segmentContainer.querySelectorAll('.edit-mode');
+            const displayModeElements = segmentContainer.querySelectorAll('.display-mode');
+    
+            editModeElements.forEach(el => el.style.display = 'none');
+            displayModeElements.forEach(el => el.style.display = '');
+    
+            document.querySelector('.save-button[data-segment="' + segmentName + '"]').style.display = 'none';
+            document.querySelector('.cancel-button[data-segment="' + segmentName + '"]').style.display = 'none';
+            document.querySelector('.edit-button[data-segment="' + segmentName + '"]').style.display = 'inline-block';
+        }
     }
-
+    
     function cancelChanges(segmentName) {
-        var rows = document.querySelectorAll('#collapse' + segmentName + ' tr');
-        rows.forEach(function(row) {
-            row.querySelectorAll('.edit-mode').forEach(function(input) {
-                input.value = input.getAttribute('data-original');
-                input.style.display = 'none';
-            });
-            row.querySelectorAll('.display-mode').forEach(function(span) { span.style.display = ''; });
-        });
+        const segmentContainer = document.querySelector('#collapse' + segmentName);
+        if (segmentContainer) {
+            segmentContainer.classList.remove('editing');
 
-        // Hide save and cancel buttons, show edit button
-        document.querySelector('.save-button[data-segment="' + segmentName + '"]').style.display = 'none';
-        document.querySelector('.cancel-button[data-segment="' + segmentName + '"]').style.display = 'none';
-        document.querySelector('.edit-button[data-segment="' + segmentName + '"]').style.display = 'inline-block';
+            const editModeElements = segmentContainer.querySelectorAll('.edit-mode');
+            const displayModeElements = segmentContainer.querySelectorAll('.display-mode');
+    
+            editModeElements.forEach(el => {
+                el.style.display = 'none';
+                const originalValue = el.getAttribute('data-original');
+                if (originalValue !== null) {
+                    el.value = originalValue;
+                }
+            });
+            displayModeElements.forEach(el => el.style.display = '');
+    
+            document.querySelector('.save-button[data-segment="' + segmentName + '"]').style.display = 'none';
+            document.querySelector('.cancel-button[data-segment="' + segmentName + '"]').style.display = 'none';
+            document.querySelector('.edit-button[data-segment="' + segmentName + '"]').style.display = 'inline-block';
+        }
     }
-
+    
     function enterEditMode(segmentName) {
-        var rows = document.querySelectorAll('#collapse' + segmentName + ' tr');
-        rows.forEach(function(row) {
-            row.querySelectorAll('.display-mode').forEach(function(span) { 
-                var input = span.nextElementSibling;
-                input.setAttribute('data-original', span.innerText);
-                span.style.display = 'none'; 
-                input.style.display = ''; 
-            });
-        });
+        const segmentContainer = document.querySelector('#collapse' + segmentName);
+        if (segmentContainer) {
+            segmentContainer.classList.add('editing');
+        }
+        const editModeElements = segmentContainer.querySelectorAll('.edit-mode');
+        const displayModeElements = segmentContainer.querySelectorAll('.display-mode');
 
-        // Show save and cancel buttons, hide edit button
+        editModeElements.forEach(el => el.style.display = 'block');
+        displayModeElements.forEach(el => el.style.display = 'none');
+
         document.querySelector('.save-button[data-segment="' + segmentName + '"]').style.display = 'inline-block';
         document.querySelector('.cancel-button[data-segment="' + segmentName + '"]').style.display = 'inline-block';
         document.querySelector('.edit-button[data-segment="' + segmentName + '"]').style.display = 'none';
