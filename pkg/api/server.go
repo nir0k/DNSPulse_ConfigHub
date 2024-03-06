@@ -22,7 +22,9 @@ func Apisrv() {
     }
 	conf := datastore.GetConfig().Api
 	gin.SetMode(gin.ReleaseMode)
-	router := gin.Default()
+	// router := gin.Default()
+	router := gin.New()
+	router.Use(gin.Recovery())
 	router.POST("/login", loginHandler)
     router.StaticFS("/static", http.FS(staticFS))
 	configRoutes := router.Group("/api/config/general")
