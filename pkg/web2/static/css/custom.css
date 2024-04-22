@@ -1,0 +1,32 @@
+/* custom.css */
+.position-relative {
+    position: relative;
+}
+
+.password-input {
+    padding-right: 30px;
+}
+
+.password-icon {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.edit-mode {
+    min-width: 200px;
+    display: none;
+}
+
+.display-mode { display: block; }
+.editing .edit-mode { display: block; }
+.editing .display-mode { display: none; }
+
+.scrollable-table {
+    max-height: calc(100vh - 270px);
+    overflow: auto;
+    position: sticky;
+    bottom: 0;
+}

@@ -1,0 +1,313 @@
+<!-- templates/config-polling.html -->
+{{ template "base.html" . }}
+
+{{ define "content" }}
+<div class="container mt-4">
+    <h2>Polling Configurations</h2>
+    <div class="container-fluid">
+        <div class="accordion" id="accordionPollingConfig">
+            {{ range $segmentName, $hosts := .Segments }}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading{{ $segmentName }}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $segmentName }}" aria-expanded="true" aria-controls="collapse{{ $segmentName }}">
+                            Segment: {{ $segmentName }}
+                        </button>
+                    </h2>
+                    <div id="collapse{{ $segmentName }}" class="accordion-collapse collapse" aria-labelledby="heading{{ $segmentName }}" data-bs-parent="#accordionPollingConfig">
+                        <div class="accordion-body">
+                            <div class="btn-group" role="group" aria-label="File Operations">
+                                <form action="/config/polling/file?segment={{ $segmentName }}" method="post" enctype="multipart/form-data">
+                                    <div class="input-group">
+                                        <input type="file" class="form-control" name="file" id="inputGroupFile{{ $segmentName }}">
+                                        <input type="hidden" name="segment" value="{{ $segmentName }}">
+                                        <button class="btn btn-outline-secondary" type="submit" id="buttonUpload{{ $segmentName }}" data-segment="{{ $segmentName }}">Upload</button>
+
+                                    </div>
+                                </form>
+                                <a href="/config/polling/file?segment={{ $segmentName }}" class="btn btn-outline-primary" role="button">Download</a>
+                            </div>
+                            <div class="edit-buttons">
+                                <button class="btn btn-primary edit-button" data-segment="{{ $segmentName }}">Edit</button>
+                                <button class="btn btn-success save-button" data-segment="{{ $segmentName }}" style="display:none;">Save</button>
+                                <button class="btn btn-danger cancel-button" data-segment="{{ $segmentName }}" style="display:none;">Cancel</button>
+                            </div>
+                            <div class="table-responsive scrollable-table">
+                                <table class="table table-striped mt-3 w-100">
+                                    <thead class="sticky-top">
+                                        <tr>
+                                            <th>Hostname</th>
+                                            <th>IP Address</th>
+                                            <th>Domain</th>
+                                            <th>Location</th>
+                                            <th>Site</th>
+                                            <th>ServerSecurityZone</th>
+                                            <th>Prefix</th>
+                                            <th>Protocol</th>
+                                            <th>Zonename</th>
+                                            <th>QueryCount</th>
+                                            <th>ZonenameWithRecursion</th>
+                                            <th>QueryCountWithRecursion</th>
+                                            <th>ServiceMode</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{ range $hosts }}
+                                            <tr>
+                                                <td>
+                                                    <span class="display-mode Server">{{ .Server }}</span>
+                                                    <input type="text" class="edit-mode form-control" value="{{ .Server }}" name="Server" style="display:none;">
+                                                </td>
+                                                <td>
+                                                    <span class="display-mode IPAddress">{{ .IPAddress }}</span>
+                                                    <input type="text" class="edit-mode form-control" value="{{ .IPAddress }}" name="IPAddress" style="display:none;">
+                                                </td>
+                                                <td>
+                                                    <span class="display-mode Domain">{{ .Domain }}</span>
+                                                    <input type="text" class="edit-mode form-control" value="{{ .Domain }}" name="Domain" style="display:none;">
+                                                </td>
+                                                <td>
+                                                    <span class="display-mode Location">{{ .Location }}</span>
+                                                    <input type="text" class="edit-mode form-control" value="{{ .Location }}" name="Location" style="display:none;">
+                                                </td>
+                                                <td>
+                                                    <span class="display-mode Site">{{ .Site }}</span>
+                                                    <input type="text" class="edit-mode form-control" value="{{ .Site }}" name="Site" style="display:none;">
+                                                </td>
+                                                <td>
+                                                    <span class="display-mode ServerSecurityZone">{{ .ServerSecurityZone }}</span>
+                                                    <input type="text" class="edit-mode form-control" value="{{ .ServerSecurityZone }}" name="ServerSecurityZone" style="display:none;">
+                                                </td>
+                                                <td>
+                                                    <span class="display-mode Prefix">{{ .Prefix }}</span>
+                                                    <input type="text" class="edit-mode form-control" value="{{ .Prefix }}" name="Prefix" style="display:none;">
+                                                </td>
+
+                                                <td>
+                                                    <span class="display-mode Protocol">{{ .Protocol }}</span>
+                                                    <input type="text" class="edit-mode form-control" value="{{ .Protocol }}" name="Protocol" style="display:none;">
+                                                </td>
+                                                <td>
+                                                    <span class="display-mode Zonename">{{ .Zonename }}</span>
+                                                    <input type="text" class="edit-mode form-control" value="{{ .Zonename }}" name="Zonename" style="display:none;">
+                                                </td>
+                                                <td>
+                                                    <span class="display-mode QueryCount">{{ .QueryCount }}</span>
+                                                    <input type="text" class="edit-mode form-control" value="{{ .QueryCount }}" name="QueryCount" style="display:none;">
+                                                </td>
+                                                <td>
+                                                    <span class="display-mode ZonenameWithRecursion">{{ .ZonenameWithRecursion }}</span>
+                                                    <input type="text" class="edit-mode form-control" value="{{ .ZonenameWithRecursion }}" name="ZonenameWithRecursion" style="display:none;">
+                                                </td>
+                                                <td>
+                                                    <span class="display-mode QueryCountWithRecursion">{{ .QueryCountWithRecursion }}</span>
+                                                    <input type="text" class="edit-mode form-control" value="{{ .QueryCountWithRecursion }}" name="QueryCountWithRecursion" style="display:none;">
+                                                </td>
+                                                <td>
+                                                    <span class="display-mode ServiceMode">{{ .ServiceMode }}</span>
+                                                    <input type="text" class="edit-mode form-control" value="{{ .ServiceMode }}" name="ServiceMode" style="display:none;">
+                                                </td>
+                                            </tr>
+                                        {{ end }}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{ end }}
+        </div>
+    </div>
+</div>
+
+<script>
+    var originalData = {};
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.btn-outline-secondary').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                var segmentName = this.dataset.segment;
+                var fileInput = document.getElementById('inputGroupFile' + segmentName);
+                var formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('segment', segmentName);
+                
+                fetch('/config/polling/file?segment=' + segmentName, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.text();
+                }).then(data => {
+                    showToast('Success', data, 'success');
+                }).catch(error => {
+                    showToast('Error', error.message, 'danger');
+                });
+            });
+        });
+    });
+
+    function showToast(title, message, type) {
+        var toastContainer = document.getElementById('toastContainer');
+        var toastId = 'toast' + Date.now();
+        var toastHtml = `
+            <div class="toast show align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true" id="${toastId}">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <strong>${title}</strong> ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>`;
+        toastContainer.innerHTML += toastHtml;
+        var toastEl = document.getElementById(toastId);
+        var bsToast = new bootstrap.Toast(toastEl);
+        bsToast.show();
+        setTimeout(function() { bsToast.dispose(); }, 5000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        document.querySelectorAll('.edit-button').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var segmentName = this.dataset.segment;
+                enterEditMode(segmentName);
+            });
+        });
+
+        document.querySelectorAll('.save-button').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var segmentName = this.dataset.segment;
+                saveChanges(segmentName);
+            });
+        });
+
+        document.querySelectorAll('.cancel-button').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var segmentName = this.dataset.segment;
+                cancelChanges(segmentName);
+            });
+        });
+    });
+    
+    function saveChanges(segmentName) {
+        var updatedData = [];
+        var rows = document.querySelectorAll('#collapse' + segmentName + ' tr');
+        rows.forEach(function(row) {
+            var rowData = {};
+            var isEmptyRow = true;
+            row.querySelectorAll('.edit-mode').forEach(function(input) {
+                rowData[input.name] = input.value;
+                if (input.value.trim() !== '') {
+                    isEmptyRow = false;
+                }
+            });
+    
+            if (!isEmptyRow) {
+                updatedData.push(rowData);
+            }
+        });
+    
+        fetch('/config/polling/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ segmentName: segmentName, data: updatedData })
+        })
+        .then(response => response.json())
+        .then(data => {
+            showToast('Success', 'Data updated successfully.', 'success');
+    
+            if (data.updatedData) {
+                updateDisplayValues(segmentName, data.updatedData);
+            }
+            exitEditMode(segmentName);
+        })
+        .catch(error => {
+            showToast('Error', 'Failed to update data: ' + error.message, 'danger');
+        });
+    }
+
+    function updateDisplayValues(segmentName, updatedData) {
+        var rows = document.querySelectorAll('#collapse' + segmentName + ' tbody tr');
+    
+        updatedData.forEach((rowData, index) => {
+            if (index < rows.length) {
+                var row = rows[index];
+                Object.entries(rowData).forEach(([key, value]) => {
+                    var displaySpan = row.querySelector('.display-mode.' + key);
+                    if (displaySpan) {
+                        displaySpan.innerText = value;
+                    }
+                    var editInput = row.querySelector('.edit-mode[name="' + key + '"]');
+                    if (editInput) {
+                        editInput.value = value;
+                    }
+                });
+            }
+        });
+    }
+    
+    function exitEditMode(segmentName) {
+        const segmentContainer = document.querySelector('#collapse' + segmentName);
+        if (segmentContainer) {
+            segmentContainer.classList.remove('editing');
+    
+            const editModeElements = segmentContainer.querySelectorAll('.edit-mode');
+            const displayModeElements = segmentContainer.querySelectorAll('.display-mode');
+    
+            editModeElements.forEach(el => el.style.display = 'none');
+            displayModeElements.forEach(el => el.style.display = '');
+    
+            document.querySelector('.save-button[data-segment="' + segmentName + '"]').style.display = 'none';
+            document.querySelector('.cancel-button[data-segment="' + segmentName + '"]').style.display = 'none';
+            document.querySelector('.edit-button[data-segment="' + segmentName + '"]').style.display = 'inline-block';
+        }
+    }
+    
+    function cancelChanges(segmentName) {
+        const segmentContainer = document.querySelector('#collapse' + segmentName);
+        if (segmentContainer) {
+            segmentContainer.classList.remove('editing');
+
+            const editModeElements = segmentContainer.querySelectorAll('.edit-mode');
+            const displayModeElements = segmentContainer.querySelectorAll('.display-mode');
+    
+            editModeElements.forEach(el => {
+                el.style.display = 'none';
+                const originalValue = el.getAttribute('data-original');
+                if (originalValue !== null) {
+                    el.value = originalValue;
+                }
+            });
+            displayModeElements.forEach(el => el.style.display = '');
+    
+            document.querySelector('.save-button[data-segment="' + segmentName + '"]').style.display = 'none';
+            document.querySelector('.cancel-button[data-segment="' + segmentName + '"]').style.display = 'none';
+            document.querySelector('.edit-button[data-segment="' + segmentName + '"]').style.display = 'inline-block';
+        }
+    }
+    
+    function enterEditMode(segmentName) {
+        const segmentContainer = document.querySelector('#collapse' + segmentName);
+        if (segmentContainer) {
+            segmentContainer.classList.add('editing');
+        }
+        const editModeElements = segmentContainer.querySelectorAll('.edit-mode');
+        const displayModeElements = segmentContainer.querySelectorAll('.display-mode');
+
+        editModeElements.forEach(el => el.style.display = 'block');
+        displayModeElements.forEach(el => el.style.display = 'none');
+
+        document.querySelector('.save-button[data-segment="' + segmentName + '"]').style.display = 'inline-block';
+        document.querySelector('.cancel-button[data-segment="' + segmentName + '"]').style.display = 'inline-block';
+        document.querySelector('.edit-button[data-segment="' + segmentName + '"]').style.display = 'none';
+    }
+    
+</script>
+
+{{ end }}

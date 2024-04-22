@@ -427,7 +427,9 @@
                                 {{ end }}
                             </tbody>
                         </table>
-                        <button type="button" class="btn btn-primary" onclick="toggleSegmentEditMode()">Edit</button>
+                        <!--<button type="button" class="btn btn-primary" onclick="toggleSegmentEditMode()">Edit</button> -->
+                        <!--<button type="button" class="btn btn-primary" id="editSegmentConfig">Edit</button> -->
+
                     </div>
 
                     <!-- Edit mode (hidden by default) -->
@@ -806,5 +808,130 @@
         row.parentNode.removeChild(row);
         // Optionally, you might want to update the 'segments' array or handle the deletion differently based on your application's needs.
     }
+
+    function toggleSegmentEditMode() {
+        // Example of toggling to edit mode and fetching current config data
+        fetch('/config/segment/get')
+            .then(response => response.json())
+            .then(data => {
+                // Assuming `data` is an array of segment configurations
+                const editTableBody = document.getElementById('segmentConfigEditTableBody');
+                editTableBody.innerHTML = ''; // Clear existing rows
+                data.forEach((segment, index) => {
+                    const row = editTableBody.insertRow();
+                    const cell1 = row.insertCell(0);
+                    const cell2 = row.insertCell(1);
+                    const cell3 = row.insertCell(2);
+                    cell1.innerHTML = index + 1;
+                    cell2.innerHTML = `<input type="text" class="form-control" value="${segment.Name}" />`;
+                    cell3.innerHTML = `<input type="text" class="form-control" value="${segment.Path}" />`;
+                    // Add more cells for additional editable fields as needed
+                });
+                // Show edit mode, hide read-only mode
+                document.getElementById('segmentConfigReadOnly').style.display = 'none';
+                document.getElementById('segmentConfigEditMode').style.display = '';
+            });
+    }
+    
+    function saveSegmentConfig() {
+        // Collect data from the form
+        const segments = [];
+        const rows = document.getElementById('segmentConfigEditTableBody').rows;
+        for (let row of rows) {
+            const inputs = row.getElementsByTagName('input');
+            segments.push({
+                Name: inputs[0].value, // Assuming the first input is for the Name
+                Path: inputs[1].value, // Assuming the second input is for the Path
+            });
+        }
+    
+        // Send data to server
+        fetch('/config/segment/update', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(segments),
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Segment configuration updated successfully.');
+                cancelSegmentEditMode(); // Or refresh the page to see changes
+            } else {
+                alert('Failed to update segment configuration.');
+            }
+        })
+        .catch(error => console.error('Error updating segment configuration:', error));
+    }
+    
+    function cancelSegmentEditMode() {
+        // Example of toggling back to read-only mode without saving changes
+        document.getElementById('segmentConfigReadOnly').style.display = '';
+        document.getElementById('segmentConfigEditMode').style.display = 'none';
+    }
+
+
+
+    function fetchSegmentConfigs() {
+        fetch('/api/config/segments')
+            .then(response => response.json())
+            .then(data => {
+                populateEditForm(data.segments);
+            })
+            .catch(error => {
+                console.error('Error fetching segment configurations:', error);
+            });
+    }
+
+    function populateEditForm(segments) {
+        const tableBody = document.getElementById('segmentConfigEditTableBody');
+        tableBody.innerHTML = ''; // Clear existing rows
+    
+        segments.forEach((segment, index) => {
+            const row = tableBody.insertRow();
+            const cellIndex = row.insertCell(0);
+            const cellName = row.insertCell(1);
+            const cellPath = row.insertCell(2);
+            const cellActions = row.insertCell(3);
+    
+            cellIndex.textContent = index + 1;
+            cellName.innerHTML = `<input type="text" class="form-control" value="${segment.SegmentName}" name="name">`;
+            cellPath.innerHTML = `<input type="text" class="form-control" value="${segment.Path}" name="path">`;
+            cellActions.innerHTML = '<button type="button" class="btn btn-danger" onclick="removeSegmentRow(this)">Remove</button>';
+        });
+    }
+   
+    document.getElementById('segmentConfigEditForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const updatedSegments = [];
+        const rows = document.querySelectorAll('#segmentConfigEditTableBody tr');
+    
+        rows.forEach(row => {
+            const name = row.querySelector('input[name="name"]').value;
+            const path = row.querySelector('input[name="path"]').value;
+            updatedSegments.push({ SegmentName: name, Path: path });
+        });
+    
+        fetch('/config/segment/update', { // Adjust this URL to your API endpoint for updating segments
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ segments: updatedSegments }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            alert('Segments updated successfully');
+            // Optionally, refresh data or exit edit mode here
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Failed to update segments');
+        });
+    });
+
+    function removeSegmentRow(button) {
+        const row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }   
+    
+    
 </script>
 {{ end }}

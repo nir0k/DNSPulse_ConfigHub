@@ -60,6 +60,7 @@ func setup() error {
     http.Handle("/", handlers.AuthMiddleware(handlers.HomeHandler(indexTemplate)))
     http.HandleFunc("/login", handlers.LoginHandler(loginTemplate))
     
+        
     http.HandleFunc("/config/general", handlers.AuthMiddleware(handlers.ConfigGeneralHandler(configGeneralTemplate)))
     http.HandleFunc("/config/general/update-general", handlers.AuthMiddleware(handlers.UpdateGeneralConfigHandler))
     http.HandleFunc("/config/general/update-log", handlers.AuthMiddleware(handlers.UpdateLogConfigHandler))

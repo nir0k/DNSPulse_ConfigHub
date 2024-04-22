@@ -55,8 +55,9 @@ func updateLogConfig(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create merge patch"})
 		return
 	}
-
+	fmt.Printf("LOG PATH1: %v\n", patch)
 	updatedConfigJSON, err := jsonpatch.MergePatch(originalConfigJSON, patch)
+	fmt.Printf("LOG PATH2: %v\n", updatedConfigJSON)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to apply merge patch"})
 		return
@@ -67,6 +68,7 @@ func updateLogConfig(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unmarshal updated config"})
 		return
 	}
+	fmt.Printf("LOG PATH3: %v\n", updatedLogConfig)
 	datastore.SetLogConfig(updatedLogConfig)
 
 	c.JSON(http.StatusOK, updatedLogConfig)
@@ -231,6 +233,8 @@ func createSegmentConfig(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	datastore.CreateEmptySegment(newSegment.Name)
 
 	c.JSON(http.StatusCreated, newSegment)
 }

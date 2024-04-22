@@ -1,0 +1,30 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html data-bs-theme="dark">
+<head>
+    <title>{{ .Title }}</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon"> <!-- Replace with your icon path -->
+
+</head>
+<body>
+    <header>
+        {{ template "navbar.html" . }}
+    </header>
+    <div aria-live="polite" aria-atomic="true" class="position-relative">
+        <div class="toast-container position-absolute top-0 end-0 p-3" id="toastContainer">
+          <!-- Toasts will be dynamically added here -->
+        </div>
+    </div>
+
+    {{ block "content" . }}{{ end }}
+
+    <footer>
+        <!-- Common footer content -->
+    </footer>
+
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

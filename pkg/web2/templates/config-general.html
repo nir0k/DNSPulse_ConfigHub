@@ -1,0 +1,571 @@
+<!-- templates/config-general.html -->
+{{ template "base.html" . }}
+
+{{ define "content" }}
+<div class="container mt-4">
+    <h1>Configuration Overview</h1>
+
+    <!-- Accordion for Collapsible Groups -->
+    <div class="accordion" id="configAccordion">
+        
+        <!-- General Configuration -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingGeneral">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGeneral" aria-expanded="false" aria-controls="collapseGeneral">
+                    General Configuration
+                </button>
+            </h2>
+            <div id="collapseGeneral" class="accordion-collapse collapse show" aria-labelledby="headingGeneral" data-bs-parent="#configAccordion">
+                <div class="accordion-body">
+                    <form id="generalConfigForm" action="#" method="post" data-endpoint="http://localhost:8080/api/config/general/main" onsubmit="submitForm('generalConfigForm'); return false;">
+                        <div class="row mb-2">
+                            <div class="col-4">Configuration Path:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.General.Path }}</span> <!-- This is visible by default -->
+                                <input type="text" class="form-control edit-mode" name="path" value="{{ .Config.General.Path }}" style="display: none;"> <!-- This is hidden by default -->
+                            </div>
+                            
+                        </div>
+                        <button type="button" class="btn btn-primary edit-mode" style="display: none;" onclick="submitForm('generalConfigForm')">Save</button>
+                        <button type="button" class="btn btn-secondary edit-mode" style="display: none;" onclick="cancelEdit()">Cancel</button>
+                    </form>
+                    <button type="button" class="btn btn-info view-mode" onclick="enableEdit()">Edit</button>
+                </div>
+            </div>
+        </div>
+        <!-- Log Configuration -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingLog">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLog" aria-expanded="false" aria-controls="collapseLog">
+                    Log Configuration
+                </button>
+            </h2>
+            <div id="collapseLog" class="accordion-collapse collapse" aria-labelledby="headingLog" data-bs-parent="#configAccordion">
+                <div class="accordion-body">
+                    <form id="logConfigForm" action="#" data-endpoint="http://localhost:8080/api/config/general/log" onsubmit="submitForm('logConfigForm'); return false;">
+                        <div class="row mb-2">
+                            <div class="col-4">Path:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.Log.Path }}</span>
+                                <input type="text" class="form-control edit-mode" name="Logpath" value="{{ .Config.Log.Path }}" style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-4">Min Severity:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.Log.MinSeverity }}</span>
+                                <input type="text" class="form-control edit-mode" name="LogMinSeverity" value="{{ .Config.Log.MinSeverity }}" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Age:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.Log.MaxAge }}</span>
+                                <input type="number" class="form-control edit-mode" name="LogMaxAge" value="{{ .Config.Log.MaxAge }}" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Size:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.Log.MaxSize }}</span>
+                                <input type="number" class="form-control edit-mode" name="LogMaxSize" value="{{ .Config.Log.MaxSize }}" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Files:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.Log.MaxFiles }}</span>
+                                <input type="number" class="form-control edit-mode" name="LogMaxFiles" value="{{ .Config.Log.MaxFiles }}" style="display: none;">
+                            </div>
+                        </div>
+                        <!-- Add similar rows for minSeverity, maxAge, maxSize, maxFiles with corresponding .Config.Log placeholders -->
+                        <div class="edit-mode" style="display: none;">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-secondary" onclick="disableEdit()">Cancel</button>
+                        </div>
+                    </form>
+                    <button type="button" class="btn btn-info view-mode" onclick="enableEdit('collapseLog')">Edit</button>
+                </div>
+            </div>
+
+        <!-- Audit Configuration -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingAudit">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAudit" aria-expanded="false" aria-controls="collapseAudit">
+                    Audit Configuration
+                </button>
+            </h2>
+            <div id="collapseAudit" class="accordion-collapse collapse" aria-labelledby="headingAudit" data-bs-parent="#configAccordion">
+                <div class="accordion-body">
+                    <form id="auditConfigForm" action="#" data-endpoint="http://localhost:8080/api/config/general/audit" onsubmit="submitForm('auditConfigForm'); return false;">
+                        <div class="row mb-2">
+                            <div class="col-4">Path:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.Audit.Path }}</span>
+                                <input type="text" class="form-control edit-mode" name="Auditpath" value="{{ .Config.Audit.Path }}" style="display: none;">
+                            </div>
+                        </div>
+                        <!-- Add similar rows for minSeverity, maxAge, maxSize, maxFiles -->
+                        <div class="row mb-2">
+                            <div class="col-4">Min Severity:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.Audit.MinSeverity }}</span>
+                                <input type="text" class="form-control edit-mode" name="AuditMinSeverity" value="{{ .Config.Audit.MinSeverity }}" style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-4">Max Age:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.Audit.MaxAge }}</span>
+                                <input type="number" class="form-control edit-mode" name="AuditMaxAge" value="{{ .Config.Audit.MaxAge }}" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Size:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.Audit.MaxSize }}</span>
+                                <input type="number" class="form-control edit-mode" name="AuditMaxSize" value="{{ .Config.Audit.MaxSize }}" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Max Files:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.Audit.MaxFiles }}</span>
+                                <input type="number" class="form-control edit-mode" name="AuditMaxFiles" value="{{ .Config.Audit.MaxFiles }}" style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="edit-mode" style="display: none;">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-secondary" onclick="disableEdit()">Cancel</button>
+                        </div>
+                    </form>
+                    <button type="button" class="btn btn-info view-mode" onclick="enableEdit('collapseAudit')">Edit</button>
+                </div>
+            </div>
+           
+        <!-- Web Configuration -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingWeb">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWeb" aria-expanded="false" aria-controls="collapseWeb">
+                    Web Configuration
+                </button>
+            </h2>
+            <div id="collapseWeb" class="accordion-collapse collapse" aria-labelledby="headingWeb" data-bs-parent="#configAccordion">
+                <div class="accordion-body">
+                    <form id="webConfigForm" action="#" data-endpoint="http://localhost:8080/api/config/general/web" onsubmit="submitForm('webConfigForm'); return false;">
+                        <!-- Each property input, similar to other configurations -->
+                        <div class="row mb-2">
+                            <div class="col-4">Port:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.Web.Port }}</span>
+                                <input type="number" class="form-control edit-mode" name="Webport" value="{{ .Config.Web.Port }}" style="display: none;">
+                            </div>
+                        </div>
+                        <!-- Add similar divs for other properties -->
+                        <div class="row mb-2">
+                            <div class="col-4">Listen Address:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.Web.ListenAddress }}</span>
+                                <input type="text" class="form-control edit-mode" name="WebListenAddress" value="{{ .Config.Web.ListenAddress }}" style="display: none;">
+                            </div>
+                        </div>
+                        <!-- SSL Enabled Checkbox -->                        
+                        <div class="row mb-2">
+                            <div class="col-4">SSL:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ if .Config.Web.SSLEnabled }}Enabled{{ else }}Disabled{{ end }}</span>
+                                <input type="checkbox" class="form-check-input edit-mode" name="sslIsEnable" {{ if .Config.Web.SSLEnabled }}checked{{ end }} style="display: none;">
+                            </div>
+                        </div>
+                        <!-- SSL-dependent fields, initially hidden if SSL is disabled -->
+                        <div id="webSslDependentFields" style="{{ if not .Config.Web.SSLEnabled }}display: none;{{ end }}">
+                            <div class="row mb-2">
+                                <!-- Certificate Path -->
+                                <div class="col-4">Certificate Path:</div>
+                                <div class="col-8">
+                                    <span class="view-mode">{{ .Config.Web.SSLCertPath }}</span>
+                                    <input type="text" class="form-control edit-mode" name="WebsslCertPath" value="{{ .Config.Web.SSLCertPath }}" style="display: none;">
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <!-- Certificate Key Path -->
+                                <div class="col-4">Certificate Key Path:</div>
+                                <div class="col-8">
+                                    <span class="view-mode">{{ .Config.Web.SSLKeyPath }}</span>
+                                    <input type="text" class="form-control edit-mode" name="WebsslKeyPath" value="{{ .Config.Web.SSLKeyPath }}" style="display: none;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Session Timeout:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.Web.SessionTimeout }}</span>
+                                <input type="number" class="form-control edit-mode" name="WebSessionTimeout" value="{{ .Config.Web.SessionTimeout }}" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Username:</div>
+                            <div class="col-8">
+                                <span class="view-mode">{{ .Config.Web.Username }}</span>
+                                <input type="text" class="form-control edit-mode" name="WebUsername" value="{{ .Config.Web.Username }}" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Password:</div>
+                            <div class="col-8">
+                                <span class="view-mode">*******</span>
+                                <input type="text" class="form-control edit-mode" name="WebPassword" value="" style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="edit-mode" style="display: none;">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-secondary" onclick="disableEdit()">Cancel</button>
+                        </div>
+                    </form>
+                    <button type="button" class="btn btn-info view-mode" onclick="enableEdit('collapseWeb')">Edit</button>
+                </div>
+            </div>
+        </div>
+        <!-- API Configuration -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingAPI">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAPI" aria-expanded="false" aria-controls="collapseAPI">
+                    API Configuration
+                </button>
+            </h2>
+            <div id="collapseAPI" class="accordion-collapse collapse" aria-labelledby="headingAPI" data-bs-parent="#configAccordion">
+                <div class="accordion-body">
+                    <form id="apiConfigForm" action="#" method="post" data-endpoint="http://localhost:8080/api/config/general/api" onsubmit="submitForm('apiConfigForm'); return false;">
+                        <div class="row mb-2">
+                            <div class="col-4">Port:</div>
+                            <div class="col-8">
+                                <input type="number" class="form-control edit-mode" name="Port" value="{{ .Config.API.Port }}">
+                                <span class="view-mode">{{ .Config.API.Port }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">SSL:</div>
+                            <div class="col-8">
+                                <input type="checkbox" class="form-check-input edit-mode" name="sslIsEnable" {{ if .Config.API.SSLEnabled }}checked{{ end }} style="display: none;">
+                                <span class="view-mode">{{ if .Config.API.SSLEnabled }}Enabled{{ else }}Disabled{{ end }}</span>
+                            </div>
+                        </div>                        
+                        <div id="apiSslDependentFields" style="{{ if not .Config.API.SSLEnabled }}display: none;{{ end }}">
+                            <div class="row mb-2">
+                                <div class="col-4">Certificate Path:</div>
+                                <div class="col-8">
+                                    <input type="text" class="form-control edit-mode" name="sslCertPath" value="{{ .Config.API.SSLCertPath }}" style="display: none;">
+                                    <span class="view-mode">{{ .Config.API.SSLCertPath }}</span>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4">Certificate Key Path:</div>
+                                <div class="col-8">
+                                    <input type="text" class="form-control edit-mode" name="sslKeyPath" value="{{ .Config.API.SSLKeyPath }}" style="display: none;">
+                                    <span class="view-mode">{{ .Config.API.SSLKeyPath }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">JWT Key:</div>
+                            <div class="col-8">
+                                <input type="text" class="form-control edit-mode" name="JWTKey" value="{{ .Config.API.JWTKey }}" style="display: none;">
+                                <span class="view-mode">{{ .Config.API.JWTKey }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Username:</div>
+                            <div class="col-8">
+                                <input type="text" class="form-control edit-mode" name="username" value="{{ .Config.API.Username }}" style="display: none;">
+                                <span class="view-mode">{{ .Config.API.Username }}</span>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4">Password:</div>
+                            <div class="col-8">
+                                <input type="password" class="form-control edit-mode" name="password" value="" style="display: none;"> <!-- Intentionally left value blank for security -->
+                                <span class="view-mode">********</span>
+                            </div>
+                        </div>
+                        <div class="edit-mode" style="display: none;">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-secondary" onclick="disableEdit()">Cancel</button>
+                        </div>
+                    </form>   
+                    <button type="button" class="btn btn-info view-mode" onclick="enableEdit('collapseAPI')">Edit</button>   
+                </div>
+            </div>
+        </div>
+        <!-- Segment Configurations -->
+        <!-- Segment Configurations -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSegments">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSegments" aria-expanded="false" aria-controls="collapseSegments">
+                    Segment Configurations
+                </button>
+            </h2>
+            <div id="collapseSegments" class="accordion-collapse collapse" aria-labelledby="headingSegments" data-bs-parent="#configAccordion">
+                <div class="accordion-body">
+                   
+                    <table class="table" id="segmentsTable">
+                        <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Path</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{ range .Config.Segments }}
+                            <tr data-segment-name="{{ .Name }}">
+                                <td>
+                                    <span class="view-mode">{{ .Name }}</span>
+                                </td>
+                                <td>
+                                    <span class="view-mode">{{ .Path }}</span>
+                                    <input type="text" class="form-control edit-mode" value="{{ .Path }}" style="display: none;">
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-info view-mode" onclick="enableSegmentEdit(this)">Edit</button>
+                                    <button type="button" class="btn btn-primary edit-mode" style="display: none;" onclick="submitSegmentUpdate(this)">Save</button>
+                                    <button type="button" class="btn btn-secondary edit-mode" style="display: none;" onclick="cancelSegmentEdit(this)">Cancel</button>
+
+                                    <button type="button" class="btn btn-danger view-mode" onclick="deleteSegment('{{ .Name }}')">Delete</button>
+                                </td>
+                            </tr>
+                            {{ else }}
+                            <tr>
+                                <td colspan="3">No segment configurations found.</td>
+                            </tr>
+                            {{ end }}
+                            <tr id="newSegmentRow">
+                                <td><input type="text" class="form-control" id="newSegmentName" placeholder="New Segment Name"></td>
+                                <td><input type="text" class="form-control" id="newSegmentPath" placeholder="New Segment Path"></td>
+                                <td>
+                                    <button type="button" class="btn btn-success" onclick="addNewSegment()">Save</button>
+                                    <button type="button" class="btn btn-secondary" onclick="cancelNewSegment()">Cancel</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        setupSSLCheckboxListener('webConfigForm', 'webSslDependentFields');
+        setupSSLCheckboxListener('apiConfigForm', 'apiSslDependentFields');
+    });
+    
+    function enableEdit(section) {
+        document.querySelectorAll('.view-mode').forEach(elem => elem.style.display = 'none');
+        document.querySelectorAll('.edit-mode').forEach(elem => elem.style.display = 'block');
+    }
+    
+    function setupSSLCheckboxListener(formId, dependentFieldsId) {
+        const form = document.getElementById(formId);
+        const sslCheckbox = form.querySelector('input[name="sslIsEnable"].edit-mode');
+        const sslDependentFields = document.getElementById(dependentFieldsId);
+    
+        // Немедленно применяем видимость в зависимости от текущего состояния флажка
+        toggleSSLDependentFields(sslCheckbox.checked, sslDependentFields);
+    
+        sslCheckbox.addEventListener('change', function() {
+            toggleSSLDependentFields(this.checked, sslDependentFields);
+        });
+    }
+    
+    function sslCheckboxChangeHandler() {
+        let sslDependentFields = document.getElementById('sslDependentFields');
+        toggleSSLDependentFields(this.checked, sslDependentFields);
+    }
+    
+    function toggleSSLDependentFields(isChecked, fieldsContainer) {
+        fieldsContainer.style.display = isChecked ? 'block' : 'none';
+    }
+    
+    function disableEdit() {
+        document.querySelectorAll('.view-mode').forEach(elem => elem.style.display = 'block');
+        document.querySelectorAll('.edit-mode').forEach(elem => elem.style.display = 'none');
+    }
+    
+    function cancelEdit() {
+        disableEdit();
+    }
+        
+    function submitForm(formId) {
+        const form = document.getElementById(formId);
+        const formData = new FormData(form);
+        const endpoint = form.getAttribute('data-endpoint');
+        const token = document.cookie.split('; ').find(row => row.startsWith('session_token=')).split('=')[1];
+    
+        let object = {};
+        formData.forEach((value, key) => {
+            // Handle boolean conversion for sslIsEnable
+            if (key === 'sslIsEnable') {
+                object['sslIsEnable'] = value === 'on';
+            } else {
+                // Convert keys and values appropriately
+                let newKey = key.replace(/^(Log|Audit|Web)/, '').replace(/^./, str => str.toLowerCase());
+                if (/^(MaxAge|MaxSize|MaxFiles|port|sessionTimeout)$/.test(newKey)) {
+                    object[newKey] = parseInt(value, 10);
+                } else {
+                    object[newKey] = value;
+                }
+            }
+        });
+    
+        // Ensure correct boolean conversion for sslIsEnable, considering it might not exist in formData
+        if (!formData.has('sslIsEnable') && formId.includes('Web')) {
+            object['sslIsEnable'] = false;
+        }
+    
+        fetch(endpoint, {
+            method: 'PATCH',
+            body: JSON.stringify(object),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
+            alert('Configuration updated successfully!');
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+            alert('Failed to update configuration.');
+        });
+    }  
+    
+    function enableSegmentEdit(button) {
+        const tr = button.closest('tr');
+        tr.querySelectorAll('.view-mode').forEach(elem => elem.style.display = 'none');
+        tr.querySelectorAll('.edit-mode').forEach(elem => elem.style.display = 'block');
+    }
+    
+    function cancelSegmentEdit(button) {
+        const tr = button.closest('tr');
+        tr.querySelectorAll('.view-mode').forEach(elem => elem.style.display = 'block');
+        tr.querySelectorAll('.edit-mode').forEach(elem => elem.style.display = 'none');
+    }
+    
+    function submitSegmentUpdate(button) {
+        const tr = button.closest('tr');
+        const segmentName = tr.dataset.segmentName;
+        const pathInput = tr.querySelector('input.edit-mode').value;
+        const endpoint = `http://localhost:8080/api/config/general/segment/${segmentName}`;
+        const token = document.cookie.split('; ').find(row => row.startsWith('session_token=')).split('=')[1];
+        
+        const payload = {
+            Name: segmentName,
+            Path: pathInput
+        };
+    
+        fetch(endpoint, {
+            method: 'PATCH',
+            body: JSON.stringify(payload),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
+            alert('Segment configuration updated successfully!');
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+            alert('Failed to update segment configuration.');
+        });
+    }    
+    function addNewSegment() {
+        const segmentName = document.getElementById('newSegmentName').value;
+        const segmentPath = document.getElementById('newSegmentPath').value;
+        const endpoint = `http://localhost:8080/api/config/general/segment`;
+        const token = document.cookie.split('; ').find(row => row.startsWith('session_token=')).split('=')[1];
+        
+        const payload = {
+            Name: segmentName,
+            Path: segmentPath
+        };
+    
+        fetch(endpoint, {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+        .then(response => {
+            if (response.status === 201) {
+                return response.json();
+            } else {
+                throw new Error('Failed to create new segment');
+            }
+        })
+        .then(data => {
+            console.log(data);
+            alert('New segment added successfully!');
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+            alert('Failed to add new segment.');
+        });
+    }
+
+    function deleteSegment(segmentName) {
+        const endpoint = `http://localhost:8080/api/config/general/segment/${segmentName}`;
+        const token = document.cookie.split('; ').find(row => row.startsWith('session_token=')).split('=')[1];
+        
+        if (!confirm(`Are you sure you want to delete the segment "${segmentName}"?`)) {
+            return; // User canceled the operation
+        }
+    
+        fetch(endpoint, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Segment deleted successfully!');
+                window.location.reload(); // Refresh the page to update the list of segments
+            } else {
+                throw new Error('Failed to delete segment');
+            }
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+            alert('Failed to delete segment.');
+        });
+    }    
+</script>
+
+{{ end }}

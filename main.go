@@ -6,8 +6,11 @@ import (
 	grpcserver "DNSPulse_ConfigHub/pkg/gRPC-server"
 	"DNSPulse_ConfigHub/pkg/logger"
 	"DNSPulse_ConfigHub/pkg/tools"
-
 	"DNSPulse_ConfigHub/pkg/web"
+	"time"
+
+	// "DNSPulse_ConfigHub/pkg/web2"
+
 	"flag"
 	"os"
 )
@@ -49,13 +52,25 @@ func setupAudit() {
 	logger.AuditSetup(auditConf.Path, auditConf.MaxSize, auditConf.MaxFiles, auditConf.MaxAge, auditConf.MinSeverity)
 }
 
+func CheckFileUpdates() {
+	ticker := time.NewTicker(5 * time.Minute)
+defer ticker.Stop()
+	for range ticker.C {
+		datastore.LoadConfig()
+		datastore.LoadSegmentConfigs()
+		datastore.LoadSegmentPollingHosts()
+	}
+}
 
 func main() {
 	setup()
 	setupAudit()
 	datastore.LoadSegmentConfigs()
 	datastore.LoadSegmentPollingHosts()
+	go CheckFileUpdates()
+	
 	go grpcserver.StartGRPCServer()
 	go api.Apisrv()
 	web.Webserver()
+	// web2.Webserver()
 }

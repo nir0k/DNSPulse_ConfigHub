@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 )
 
 //go:embed html/*.html static/*
@@ -22,10 +23,21 @@ func Apisrv() {
     }
 	conf := datastore.GetConfig().Api
 	gin.SetMode(gin.ReleaseMode)
+	router := gin.New()  // TODO: Debug
 	// router := gin.Default()
-	router := gin.New()
-	router.Use(gin.Recovery())
-	router.POST("/login", loginHandler)
+	// router.Use(cors.Default()) // TODO: May be need to delete
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:8080", "https://localhost:8443"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Authorization", "Content-Type", "Origin", "Accept"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+	
+	
+	router.Use(gin.Recovery()) // TODO: Debug
+	router.POST("/auth/login", loginHandler)
+	router.GET("/token/validate", tokenAuthMiddleware(), tokenValidHandler)
     router.StaticFS("/static", http.FS(staticFS))
 	configRoutes := router.Group("/api/config/general")
 	configRoutes.Use(tokenAuthMiddleware())
@@ -64,6 +76,7 @@ func Apisrv() {
 	configRoutes = router.Group("/api/config/segment")
 	configRoutes.Use(tokenAuthMiddleware())
 	{
+		configRoutes.GET("/", getSegmentNamesHandler)
 		configRoutes.GET("/:name/main", getSegmentMainConfig)
 		configRoutes.PATCH("/:name/main", updateSegmentMainConfig)
 		configRoutes.PUT("/:name/main", updateSegmentMainConfig)
@@ -102,7 +115,7 @@ func Apisrv() {
     router.GET("/api/api-spec", wrapHandler(ServeAPISpec(staticFS, conf.Port)))
 	
 	fmt.Printf("API starting on port %d. TLS: %v\n", conf.Port, conf.SSLEnabled)
-    logger.Logger.Infof("Web Server starting on %d. TLS: %v", conf.Port, conf.SSLEnabled)
+    logger.Logger.Infof("API starting on port %d. TLS: %v", conf.Port, conf.SSLEnabled)
 	if conf.SSLEnabled {
 		err = router.RunTLS(fmt.Sprintf(":%d", conf.Port), conf.SSLCertPath, conf.SSLKeyPath)
 	} else {
@@ -111,7 +124,7 @@ func Apisrv() {
 	
 	if err != nil {
 		fmt.Printf("Failed to start API on port%d. TLS: %v\n", conf.Port, conf.SSLEnabled)
-		logger.Logger.Fatalf("Failed to start server: %v", err)
+		logger.Logger.Fatalf("Failed to start API on port%d. TLS: %v, %v", conf.Port, conf.SSLEnabled, err)
 	}
 	
 }

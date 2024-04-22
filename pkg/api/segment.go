@@ -14,6 +14,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func getSegmentNamesHandler(c *gin.Context) {
+	segmentNames := datastore.GetAllSegmentNames()
+	c.JSON(http.StatusOK, gin.H{"segmentNames": segmentNames})
+}
+
 func getSegmentMainConfig(c *gin.Context) {
 	segmentName := c.Param("name")
 	cfg, _ := datastore.GetSegmentsConfigBySegment(segmentName)
@@ -45,51 +50,51 @@ func getSegmentPrometheusLabelsConfig(c *gin.Context) {
 }
 
 func getSegmentPollingHostsConfig(c *gin.Context) {
-    segmentName := c.Param("name")
+	segmentName := c.Param("name")
 
-    pageStr := c.DefaultQuery("page", "1")
-    perPageStr := c.DefaultQuery("perPage", "10")
-    page, _ := strconv.Atoi(pageStr)
-    perPage, _ := strconv.Atoi(perPageStr)
+	pageStr := c.DefaultQuery("page", "1")
+	perPageStr := c.DefaultQuery("perPage", "10")
+	page, _ := strconv.Atoi(pageStr)
+	perPage, _ := strconv.Atoi(perPageStr)
 
-    allServers, exists := datastore.GetPollingHostsBySegment(segmentName)
-    if !exists {
-        c.JSON(http.StatusNotFound, gin.H{"error": "Segment not found"})
-        return
-    }
+	allServers, exists := datastore.GetPollingHostsBySegment(segmentName)
+	if !exists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Segment not found"})
+		return
+	}
 
-    query := c.Request.URL.Query()
-    filteredServers := filterServers(allServers, query)
+	query := c.Request.URL.Query()
+	filteredServers := filterServers(allServers, query)
 
-    totalRecords := len(filteredServers)
-    totalPages := int(math.Ceil(float64(totalRecords) / float64(perPage)))
-    startIndex := (page - 1) * perPage
-    endIndex := startIndex + perPage
-    if endIndex > totalRecords {
-        endIndex = totalRecords
-    }
+	totalRecords := len(filteredServers)
+	totalPages := int(math.Ceil(float64(totalRecords) / float64(perPage)))
+	startIndex := (page - 1) * perPage
+	endIndex := startIndex + perPage
+	if endIndex > totalRecords {
+		endIndex = totalRecords
+	}
 
-    paginatedServers := filteredServers[startIndex:endIndex]
+	paginatedServers := filteredServers[startIndex:endIndex]
 
-    pagination := gin.H{
-        "total_records": totalRecords,
-        "current_page":  page,
-        "total_pages":   totalPages,
-        "next_page":     nil,
-        "prev_page":     nil,
-    }
-    if page < totalPages {
-        pagination["next_page"] = page + 1
-    }
-    if page > 1 {
-        pagination["prev_page"] = page - 1
-    }
+	pagination := gin.H{
+		"total_records": totalRecords,
+		"current_page":  page,
+		"total_pages":   totalPages,
+		"next_page":     nil,
+		"prev_page":     nil,
+	}
+	if page < totalPages {
+		pagination["next_page"] = page + 1
+	}
+	if page > 1 {
+		pagination["prev_page"] = page - 1
+	}
 
-    response := gin.H{
-        "data":       paginatedServers,
-        "pagination": pagination,
-    }
-    c.JSON(http.StatusOK, response)
+	response := gin.H{
+		"data":       paginatedServers,
+		"pagination": pagination,
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 func updateSegmentMainConfig(c *gin.Context) {
@@ -522,23 +527,22 @@ func filterServers(servers []datastore.Csv, query map[string][]string) []datasto
 	return filtered
 }
 
-
 func fieldMatches(server datastore.Csv, field, queryValue string) bool {
-    v := reflect.ValueOf(server)
-    f := reflect.Indirect(v).FieldByName(field)
-    if !f.IsValid() {
-        return false
-    }
-    fieldValue := strings.ToLower(f.String())
-    queryValueLower := strings.ToLower(queryValue)
-    return strings.Contains(fieldValue, queryValueLower)
+	v := reflect.ValueOf(server)
+	f := reflect.Indirect(v).FieldByName(field)
+	if !f.IsValid() {
+		return false
+	}
+	fieldValue := strings.ToLower(f.String())
+	queryValueLower := strings.ToLower(queryValue)
+	return strings.Contains(fieldValue, queryValueLower)
 }
 
 func DownloadSegmentConfigHandler(c *gin.Context) {
 	segmentName := c.Param("name")
-    configPath := datastore.GetSegmentConfigFilePath(segmentName)
+	configPath := datastore.GetSegmentConfigFilePath(segmentName)
 	filename := fmt.Sprintf("%s.yaml", segmentName)
-    c.FileAttachment(configPath, filename)
+	c.FileAttachment(configPath, filename)
 }
 
 func UploadSegmentConfigHandler(c *gin.Context) {
@@ -549,7 +553,7 @@ func UploadSegmentConfigHandler(c *gin.Context) {
 	}
 
 	segmentName := c.Param("name")
-    configPath := datastore.GetSegmentConfigFilePath(segmentName)
+	configPath := datastore.GetSegmentConfigFilePath(segmentName)
 	if err := c.SaveUploadedFile(file, configPath); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save the uploaded file"})
 		return
@@ -560,9 +564,9 @@ func UploadSegmentConfigHandler(c *gin.Context) {
 
 func DownloadSegmentPollingHandler(c *gin.Context) {
 	segmentName := c.Param("name")
-    configPath := datastore.GetSegmentsPollingConfigbySegment(segmentName).Path
+	configPath := datastore.GetSegmentsPollingConfigbySegment(segmentName).Path
 	filename := fmt.Sprintf("%s.csv", segmentName)
-    c.FileAttachment(configPath, filename)
+	c.FileAttachment(configPath, filename)
 }
 
 func UploadSegmentPollingHandler(c *gin.Context) {
@@ -573,7 +577,7 @@ func UploadSegmentPollingHandler(c *gin.Context) {
 	}
 
 	segmentName := c.Param("name")
-    configPath := datastore.GetSegmentsPollingConfigbySegment(segmentName).Path
+	configPath := datastore.GetSegmentsPollingConfigbySegment(segmentName).Path
 	if err := c.SaveUploadedFile(file, configPath); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save the uploaded file"})
 		return

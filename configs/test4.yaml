@@ -1,0 +1,30 @@
+segmentname: test4
+General:
+  confCheckInterval: 11
+Sync:
+  isEnable: false
+  token: ""
+Prometheus:
+  url: ""
+  auth: false
+  username: ""
+  password: ""
+  metricName: ""
+  retriesCount: 0
+  buferSize: 0
+  labels:
+    opcode: false
+    authoritative: false
+    truncated: false
+    rcode: false
+    recursionDesired: false
+    recursionAvailable: false
+    authenticatedData: false
+    checkingDisabled: false
+    pollingRate: false
+    recursion: false
+Resolvers:
+  path: ""
+  delimeter: ""
+  extraDelimeter: ""
+  pullTimeout: 0

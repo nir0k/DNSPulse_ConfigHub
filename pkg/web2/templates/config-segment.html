@@ -1,0 +1,252 @@
+{{ template "base.html" . }}
+
+{{ define "content" }}
+<div class="container mt-4">
+    <h1>Segment Configurations</h1>
+    <div class="accordion" id="segmentsAccordion">
+        {{ range .Segments }}
+        <!-- Parent Group for Each Segment -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ .Name }}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSegment{{ .Name }}" aria-expanded="false" aria-controls="collapseSegment{{ .Name }}">
+                    {{ .Name }} Configuration
+                </button>
+            </h2>
+            <div id="collapseSegment{{ .Name }}" class="accordion-collapse collapse" aria-labelledby="heading{{ .Name }}" data-bs-parent="#segmentsAccordion">
+                <div class="accordion-body">
+                    <!-- Nested Group for Main Configuration -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingMain{{ .Name }}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMain{{ .Name }}" aria-expanded="false" aria-controls="collapseMain{{ .Name }}">
+                                Main Configuration
+                            </button>
+                        </h2>
+                        <div id="collapseMain{{ .Name }}" class="accordion-collapse collapse" aria-labelledby="headingMain{{ .Name }}" data-bs-parent="#collapseSegment{{ .Name }}">
+                            <div class="accordion-body">
+                                <form id="mainConfigForm{{ .Name }}" action="#" method="post" data-endpoint="http://localhost:8080/api/config/segment/{{ .Name }}/main" onsubmit="submitMainForm('mainConfigForm{{ .Name }}'); return false;">
+                                    <div class="row mb-2">
+                                        <div class="col-4">Conf Check Interval:</div>
+                                        <div class="col-8">
+                                            <span class="view-mode">{{ .ConfCheckInterval }}</span> <!-- This is visible by default -->
+                                            <input type="number" class="form-control edit-mode" name="confCheckInterval" value="{{ .ConfCheckInterval }}" style="display: none;"> <!-- This is hidden by default -->
+                                        </div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-4">Hash:</div>
+                                        <div class="col-8">
+                                            <span class="view-mode">{{ .Hash }}</span> <!-- This is visible by default -->
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-primary edit-mode" style="display: none;" onclick="submitMainForm('{{ .Name }}')">Save</button>
+                                    <button type="button" class="btn btn-secondary edit-mode" style="display: none;" onclick="cancelMainEdit('{{ .Name }}')">Cancel</button>
+                                </form>
+                                <button type="button" class="btn btn-info view-mode" onclick="enableMainEdit('{{ .Name }}')">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Nested Group for Sync Configuration -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingSync{{ .Name }}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSync{{ .Name }}" aria-expanded="false" aria-controls="collapseSync{{ .Name }}">
+                                Sync Configuration
+                            </button>
+                        </h2>
+                        <div id="collapseSync{{ .Name }}" class="accordion-collapse collapse" aria-labelledby="headingSync{{ .Name }}" data-bs-parent="#collapseSegment{{ .Name }}">
+                            <div class="accordion-body">
+                                <div class="row mb-2">
+                                    <div class="col-4">Sync Enabled:</div>
+                                    <div class="col-8">
+                                        <span class="view-mode">{{ .SyncIsEnable }}</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4">Sync Token:</div>
+                                    <div class="col-8">
+                                        <span class="view-mode">{{ .SyncToken }}</span>
+                                    </div>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                    <!-- Nested Group for Polling Configuration -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingPolling{{ .Name }}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePolling{{ .Name }}" aria-expanded="false" aria-controls="collapsePolling{{ .Name }}">
+                                Polling Configuration
+                            </button>
+                        </h2>
+                        <div id="collapsePolling{{ .Name }}" class="accordion-collapse collapse" aria-labelledby="headingPolling{{ .Name }}" data-bs-parent="#collapseSegment{{ .Name }}">
+                            <div class="accordion-body">
+                                <div class="row mb-2">
+                                    <div class="col-4">Polling Path:</div>
+                                    <div class="col-8">
+                                        <span class="view-mode">{{ .PollingPath }}</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4">Polling Hash:</div>
+                                    <div class="col-8">
+                                        <span class="view-mode">{{ .PollingHash }}</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4">Delimiter:</div>
+                                    <div class="col-8">
+                                        <span class="view-mode">{{ .Delimeter }}</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4">Extra Delimiter:</div>
+                                    <div class="col-8">
+                                        <span class="view-mode">{{ .ExtraDelimeter }}</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4">Pull Timeout:</div>
+                                    <div class="col-8">
+                                        <span class="view-mode">{{ .PullTimeout }}</span>
+                                    </div>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                    <!-- Nested Group for Prometheus Configuration -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingPrometheus{{ .Name }}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePrometheus{{ .Name }}" aria-expanded="false" aria-controls="collapsePrometheus{{ .Name }}">
+                                Prometheus Configuration
+                            </button>
+                        </h2>
+                        <div id="collapsePrometheus{{ .Name }}" class="accordion-collapse collapse" aria-labelledby="headingPrometheus{{ .Name }}" data-bs-parent="#collapseSegment{{ .Name }}">
+                            <div class="accordion-body">
+                                <div class="row mb-2">
+                                    <div class="col-4">Prometheus URL:</div>
+                                    <div class="col-8">
+                                        <span class="view-mode">{{ .PrometheusURL }}</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4">Authentication Required:</div>
+                                    <div class="col-8">
+                                        <span class="view-mode">{{ if .PrometheusAuth }}Yes{{ else }}No{{ end }}</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4">Username:</div>
+                                    <div class="col-8">
+                                        <span class="view-mode">{{ .PrometheusUsername }}</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4">Password:</div>
+                                    <div class="col-8">
+                                        <span class="view-mode">*********</span> <!-- Assuming you don't want to display this -->
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4">Metric Name:</div>
+                                    <div class="col-8">
+                                        <span class="view-mode">{{ .MetricName }}</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4">Retries Count:</div>
+                                    <div class="col-8">
+                                        <span class="view-mode">{{ .RetriesCount }}</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-4">Buffer Size:</div>
+                                    <div class="col-8">
+                                        <span class="view-mode">{{ .BuferSize }}</span>
+                                    </div>
+                                </div>
+                                <!-- Assuming Labels is a map you want to display as a list -->
+                                <div class="accordion accordion-flush" id="labelsAccordion{{ .Name }}">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingLabels{{ .Name }}">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLabels{{ .Name }}" aria-expanded="false" aria-controls="collapseLabels{{ .Name }}">
+                                                Labels
+                                            </button>
+                                        </h2>
+                                        <div id="collapseLabels{{ .Name }}" class="accordion-collapse collapse" aria-labelledby="headingLabels{{ .Name }}" data-bs-parent="#labelsAccordion{{ .Name }}">
+                                            <div class="accordion-body">
+                                                {{ range $key, $value := .Labels }}
+                                                <div class="row mb-2">
+                                                    <div class="col-4">{{ $key }}:</div>
+                                                    <div class="col-8">
+                                                        <span class="view-mode">{{ if $value }}Enabled{{ else }}Disabled{{ end }}</span>
+                                                    </div>
+                                                </div>
+                                                {{ end }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ else }}
+        <p>No segment configurations found.</p>
+        {{ end }}
+    </div>
+</div>
+
+<script>
+    function enableMainEdit(segmentName) {
+        const formId = `mainConfigForm${segmentName}`;
+        // Show edit-mode elements and hide view-mode elements
+        document.querySelectorAll(`#${formId} .edit-mode`).forEach(elem => elem.style.display = 'block');
+        document.querySelectorAll(`#${formId} .view-mode`).forEach(elem => elem.style.display = 'none');
+        // Hide the "Edit" button for this specific segment
+        const editButton = document.querySelector(`button[onclick="enableMainEdit('${segmentName}')"]`);
+        if (editButton) editButton.style.display = 'none';
+    }
+
+    function cancelMainEdit(segmentName) {
+        const formId = `mainConfigForm${segmentName}`;
+        // Hide edit-mode elements and show view-mode elements
+        document.querySelectorAll(`#${formId} .edit-mode`).forEach(elem => elem.style.display = 'none');
+        document.querySelectorAll(`#${formId} .view-mode`).forEach(elem => elem.style.display = 'block');
+        // Show the "Edit" button for this specific segment
+        const editButton = document.querySelector(`button[onclick="enableMainEdit('${segmentName}')"]`);
+        if (editButton) editButton.style.display = 'inline-block';
+    }
+    
+    function submitMainForm(segmentName) {
+        const formId = `mainConfigForm${segmentName}`;
+        const form = document.getElementById(formId); // Убедимся, что эта строка добавлена для определения переменной `form`
+        const endpoint = form.getAttribute('data-endpoint');
+        const formData = new FormData(form);
+        const confCheckInterval = parseInt(formData.get('confCheckInterval'), 10);
+        const token = document.cookie.split('; ').find(row => row.startsWith('session_token=')).split('=')[1];
+    
+        fetch(endpoint, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "confCheckInterval": confCheckInterval })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            // Используем formId для поиска контейнера сегмента, а затем ищем .view-mode span внутри него
+            const viewModeSpan = document.querySelector(`#${formId} .view-mode span`);
+            if (viewModeSpan) {
+                viewModeSpan.textContent = data.confCheckInterval; // Обновляем текст в span
+            } else {
+                console.error('Could not find the view-mode span for', formId);
+            }
+            cancelMainEdit(segmentName);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }     
+</script>
+{{ end }}

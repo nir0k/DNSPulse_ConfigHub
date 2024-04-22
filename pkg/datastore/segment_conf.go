@@ -102,8 +102,43 @@ func UpdateSegmentConfig(newConf SegmentConfStruct) error {
 	return nil
 }
 
+func GetAllSegmentNames() []string {
+    segmentConfigMutex.RLock()
+    defer segmentConfigMutex.RUnlock()
+
+    var segmentNames []string
+	fmt.Printf("segmentsConfig: %v\n", segmentsConfig)
+    for name := range segmentsConfig {
+        segmentNames = append(segmentNames, name)
+    }
+    return segmentNames
+}
+
 // API
 
+func CreateEmptySegment(segmentName string) error {
+    segmentConfigMutex.Lock()
+    defer segmentConfigMutex.Unlock()
+
+    if _, exists := segmentsConfig[segmentName]; exists {
+        return fmt.Errorf("segment '%s' already exists", segmentName)
+    }
+
+    newSegment := SegmentConfStruct{
+        SegmentName: segmentName,
+        General:     SegmentGeneralConfigStruct{},
+        Sync:        SegmentSyncConfigStruct{},
+        Prometheus:  PrometheusConfStruct{},
+        Polling:     PollingConfigStruct{},
+    }
+
+    segmentsConfig[segmentName] = newSegment
+
+    // Optionally, you might want to save the new configuration map to a file or database
+    // SaveSegmentConfigs()
+
+    return nil
+}
 
 
 func LoadSegmentConfigs() error {
@@ -115,26 +150,30 @@ func LoadSegmentConfigs() error {
 }
 
 func loadSegmentConfig(s SegmentConfigsStruct) (bool, error) {
+	// var newConfig SegmentConfStruct
 	fileData, err := os.ReadFile(s.Path)
+	newHash := "null"
     if err != nil {
-        return false, err
-    }
-    newHash, err := tools.CalculateHash(string(s.Path))
-    if err != nil {
-        logger.Logger.Errorf("Error Calculate hash to file '%s' (segment: %s) err: %v\n", s.Path, s.Name, err)
-        return false, err
-    }
-    if segmentsConfig[s.Name].General.Hash == newHash {
-        logger.Logger.Debugf("Configuration for %s has not been changed", s.Name)
-        return false, nil
-    }
-    logger.Logger.Infof("Configuration file %s (segment: %s) has been changed", s.Path, s.Name)
+		logger.Logger.Errorf("Error read file '%s' (segment: %s) err: %v\n", s.Path, s.Name, err)
+    } else {
+		newHash, err = tools.CalculateHash(string(s.Path))
+		if err != nil {
+			logger.Logger.Errorf("Error Calculate hash to file '%s' (segment: %s) err: %v\n", s.Path, s.Name, err)
+			return false, err
+		}
+		if segmentsConfig[s.Name].General.Hash == newHash {
+			logger.Logger.Debugf("Configuration for %s has not been changed", s.Name)
+			return false, nil
+		}
+		logger.Logger.Infof("Configuration file %s (segment: %s) has been changed", s.Path, s.Name)
+	}
+    
 
 	var newConfig SegmentConfStruct
     if err := yaml.Unmarshal(fileData, &newConfig); err != nil {
         return false, err
     }
-
+	newConfig.SegmentName = s.Name
 	newConfig.General.Hash = newHash
 	segmentConfigMutex.Lock()
     segmentsConfig[s.Name] = newConfig
